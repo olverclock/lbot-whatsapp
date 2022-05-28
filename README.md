@@ -20,8 +20,10 @@
 <a href="#"><img title="Atualizacao" src="https://img.shields.io/badge/atualizado-SIM-blue.svg"/></a>
 </p>
 
-## Atualização 1.17.1
-**[CORREÇÃO]** Corrigida a contagem de limite diário de comandos<br>
+## Atualização 1.17.2
+**[CORREÇÃO]** Comando !ssf para sticker sem fundo foi corrigido <br>
+**[DEPENDÊNCIAS]** As dependências necessárias foram atualizadas. <br>
+**[NOVO]** Agora o BOT funciona no modo BETA do WhatsApp sem precisar de conexão ativa com o celular. <br>
 
 <br>
 Recomendo que instalem novamente do ZERO para que tudo funcione corretamente.
@@ -67,7 +69,7 @@ Dentro da pasta do projeto após ter realizado todos os passos anteriores, execu
 npm start
 ```
 
-Se for a sua primeira vez executando escaneie o QR Code com o seu celular e digite no terminal **SEU** número de telefone **COM CÓDIGO DO PAÍS** no terminal. Ele irá encerrar o bot e você deverá inicia-lo novamente.
+Se for a sua primeira vez executando escaneie o QR Code com o seu celular (No modo BETA que não exige conexão com o celular) e digite no terminal **SEU** número de telefone **COM CÓDIGO DO PAÍS** no terminal. Ele irá encerrar o bot e você deverá inicia-lo novamente.
 
 <br>
 
