@@ -1,79 +1,67 @@
 <p align="center">
-<img src="https://avatars0.githubusercontent.com/u/4674786?s=400&u=2f77d382a4428c141558772a2b7ad3a36bebf5bc&v=4" width="128" height="128"/>
+<img src="https://img95.pixhost.to/images/1083/472612217_8876.jpg" width="350" height="350"/>
+</p>
+<h1 align="center">🤖 LBot - Robô para WhatsApp 🤖</h1>
+<p align="center">
+<a href="https://www.codefactor.io/repository/github/victorsouzaleal/lbot-whatsapp"><img src="https://img.shields.io/codefactor/grade/github/victorsouzaleal/lbot-whatsapp?label=qualidade&color=#79C83D" alt="CodeFactor" /></a>
 </p>
 <p align="center">
-<a href="#"><img title="LBot-WhatsApp" src="https://img.shields.io/badge/LBot%20WhatsApp-green?colorA=%23ff0000&colorB=%23017e40&style=for-the-badge"></a>
+<a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fvictorsouzaleal%2Flbot-whatsapp&count_bg=%234dc61f&title_bg=%23555555&icon=&icon_color=%23E7E7E7&title=visualizacoes&edge_flat=false"/></a>
+<a href="#"><img title="Versão" src="https://img.shields.io/github/package-json/v/victorsouzaleal/lbot-whatsapp?label=vers%C3%A3o&color=#79C83D"/></a>
+<a href="https://github.com/victorsouzaleal/followers"><img title="Seguidores" src="https://img.shields.io/github/followers/victorsouzaleal?label=seguidores&style=flat&color=#79C83D"/></a>
+<a href="https://github.com/victorsouzaleal/lbot-whatsapp/stargazers/"><img title="Estrelas" src="https://img.shields.io/github/stars/victorsouzaleal/lbot-whatsapp?label=estrelas&style=flat&color=#79C83D"></a>
+<a href="https://github.com/victorsouzaleal/lbot-whatsapp/watchers"><img title="Acompanhando" src="https://img.shields.io/github/watchers/victorsouzaleal/lbot-whatsapp?label=acompanhando&style=flat&color=#79C83D"></a>
+<a href="https://github.com/victorsouzaleal"><img title="Autor" src="https://img.shields.io/badge/autor-victorsouzaleal-blue.svg?logo=github&color=#79C83D"></a>
 </p>
-<p align="center">
-<a href="https://github.com/victorsouzaleal"><img title="Autor" src="https://img.shields.io/badge/Autor-victorsouzaleal-blue.svg?style=for-the-badge&logo=github"></a>
-</p>
-<p align="center">
-<a href="https://www.codefactor.io/repository/github/victorsouzaleal/lbot-whatsapp"><img src="https://www.codefactor.io/repository/github/victorsouzaleal/lbot-whatsapp/badge" alt="CodeFactor" /></a>
-</p>
-<p align="center">
-<a href="https://hits.seeyoufarm.com"><img src="https://hits.seeyoufarm.com/api/count/incr/badge.svg?url=https%3A%2F%2Fgithub.com%2Fvictorsouzaleal%2Flbot-whatsapp&count_bg=%231D8ED9&title_bg=%23454545&icon=github.svg&icon_color=%23E7E7E7&title=visualizacoes&edge_flat=true"/></a>
-<a href="#"><img title="Versão" src="https://img.shields.io/github/package-json/v/victorsouzaleal/lbot-whatsapp?label=vers%C3%A3o&style=flat-square"></a>
-<a href="#"><img title="Tamanho" src="https://img.shields.io/github/repo-size/victorsouzaleal/lbot-whatsapp?label=tamanho&style=flat-square"></a>
-<a href="https://github.com/victorsouzaleal/followers"><img title="Seguidores" src="https://img.shields.io/github/followers/victorsouzaleal?label=seguidores&style=flat-square"></a>
-<a href="https://github.com/victorsouzaleal/lbot-whatsapp/stargazers/"><img title="Estrelas" src="https://img.shields.io/github/stars/victorsouzaleal/lbot-whatsapp?label=estrelas&style=flat-square"></a>
-<a href="https://github.com/victorsouzaleal/lbot-whatsapp/watchers"><img title="Acompanhando" src="https://img.shields.io/github/watchers/victorsouzaleal/lbot-whatsapp?label=acompanhando&color=blue&style=flat-square"></a>
-<a href="#"><img title="Atualizacao" src="https://img.shields.io/badge/atualizado-SIM-blue.svg"/></a>
-</p>
-
-## Atualização 1.17.2
-**[CORREÇÃO]** Comando !ssf para sticker sem fundo foi corrigido <br>
-**[DEPENDÊNCIAS]** As dependências necessárias foram atualizadas. <br>
-**[NOVO]** Agora o BOT funciona no modo BETA do WhatsApp sem precisar de conexão ativa com o celular. <br>
-
-<br>
-Recomendo que instalem novamente do ZERO para que tudo funcione corretamente.
-<br>
-
-## REQUERIMENTOS :
-- [GIT](https://git-scm.com/downloads)
-- [NODE VERSÃO LTS](https://nodejs.org/en/) 
-- [GOOGLE CHROME](https://www.google.com/intl/pt-BR/chrome/)
-
-Isso tudo é necessário para o bot funcionar corretamente.
-
-## 1 - Clone este projeto OU faça download da ultima release :
-Para clonar, digite os comandos abaixo no Terminal do seu sistema:
-
-```bash
-git clone https://github.com/victorsouzaleal/lbot-whatsapp.git
-cd lbot-whatsapp
-```
-
-Ou se quiser fazer o download diretamente (extraia o zip e entre na pasta para os passos seguintes):
-https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest
+<h3 align="center">⭐ Atualizações toda semana.</h3>
 
 <br>
 
-## 2 - Instale as dependências :
-Antes de executar o comando abaixo, tenha certeza que você está 
-no diretório do projeto que você clonou/fez download!
+## 🔄 Última Atualização: [AQUI](https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest)
+
+<br>
+
+## 🚨 REQUERIMENTOS :
+- Um número de celular conectado ao WhatsApp para ler o QR Code e conectar o bot.
+- Em sistemas **Windows/Linux** :<br>
+        - Ter o [NODE VERSÃO LTS](https://nodejs.org/en/) instalado
+- No **Termux** :<br>
+        - Ter o [TERMUX](https://github.com/termux/termux-app/releases/download/v0.118.0/termux-app_v0.118.0+github-debug_universal.apk) instalado no celular
+
+<br>
+
+## 1 - 💿 Instalação :
+
+### 🖥️ Windows/Linux :
+
+Faça o download da última versão lançada no seguinte link: https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest , extraia o zip e entre na pasta do bot para os passos seguintes.
+
+Abra o prompt de comando (terminal) **DENTRO DA PASTA DO PROJETO** e execute os comandos abaixo :
 
 ```bash
 npm i
 ```
 
-#### Obs: Se houver algum erro vá para o [Passo 7](https://github.com/victorsouzaleal/lbot-whatsapp#7---solu%C3%A7%C3%A3o-de-problemas-)
+<br>
+
+### 📱 Termux :
+Para ver o guia de instalação no TERMUX :  [Clique AQUI](docs/TERMUX.md)
 
 <br>
 
-## 3 - Uso :
+## 2 - 🤖 Uso :
 
-Dentro da pasta do projeto após ter realizado todos os passos anteriores, execute este comando. 
+**Dentro da pasta do projeto** após ter realizado todos os passos anteriores, execute este comando. 
 
 ```bash
 npm start
 ```
 
-Se for a sua primeira vez executando escaneie o QR Code com o seu celular (No modo BETA que não exige conexão com o celular) e digite no terminal **SEU** número de telefone **COM CÓDIGO DO PAÍS** no terminal. Ele irá encerrar o bot e você deverá inicia-lo novamente.
+Se for a sua primeira vez executando escaneie o QR Code com o seu celular.
 
 <br>
 
-## 4 - Funcionamento :
+## 3 - ⌨️ Funcionamento :
 Após todos os passos anteriores feitos, seu bot já deve estar iniciando normalmente, use os comandos abaixo para visualizar os comandos disponíveis.
 <br><br>
 **!menu** - Dá acesso ao MENU PRINCIPAL.
@@ -81,163 +69,94 @@ Após todos os passos anteriores feitos, seu bot já deve estar iniciando normal
 **!admin** - Dá acesso ao MENU de ADMINISTRADOR/DONO DO BOT.
 <br><br>
 Todos os comandos agora tem um guia ao digitar **!comando guia**
+<br><br>
 
-### Pronto! Seu bot já está funcionando!!
-
-**Obs**: Se você deseja utilizar os comandos **!noticias** (noticias atuais), **!qualmusica**(reconhecimento de músicas) e o recurso de **anti-pornografia** vá para o **passo 5**.
-
-<br>
-
-## 5 - Configuração do arquivo .env :
-
-#### Abra o arquivo .env na raiz do projeto e edite manualmente : </br>
-        #############  DADOS DO BOT ############# 
-
-        NOME_ADMINISTRADOR= Digite seu nome
-        NOME_BOT= Digite o nome que o bot vai ter
-        NOME_AUTOR_FIGURINHAS = Digite o nome que vai aparecer como autor das figurinhas
-
-        ############ CONFIGURAÇÕES DO BOT ############# 
-
-        # LEMBRE-SE SEU NÚMERO DE WHATSAPP E NÃO O DO BOT.
-        NÚMERO_DONO = SEU número com o código do país incluido. ex: 55219xxxxxxxx
-        # NEWSAPI - NOTICIAS 
-        API_NEWS_ORG = recebe a chave da conta que voce criar no site newsapi.org 
-        # ACRCLOUD - RECONHECIMENTO DE MÚSICAS
-        acr_host= recebe seu endereço de host obtido no https://acrcloud.com/
-        acr_access_key= recebe seu access_key obtido no https://acrcloud.com/
-        acr_access_secret= recebe seu access_secret obtido no https://acrcloud.com/
-        # DEEPAI - DETECTOR DE NUDEZ/PORNOGRAFIA
-        API_DEEPAI= recebe a chave da conta que voce criar no site deepai.org 
-
-**Obs**: Se o seu sistema for MAC, habilite a exibição de arquivos ocultos para exibir o .env na raiz do projeto.<br>
-
-**Informações detalhadas sobre como obter as chaves do NewsAPI(Notícias), ACRCloud(Reconhecimento de Músicas) e DeepAI(Detector de Nudez e Pornografia)** :  [Clique AQUI](CHAVESAPI.md)
+### Pronto! Seu bot já está ONLINE, mas ainda não acabou continue lendo o próximo passo para configuração!!
 
 <br>
 
-## 6 - Recursos Principais :
+## 4 - ⚙️ Configuração do bot e arquivo .env :
 
-### Figurinhas
+### Ao abrir o arquivo .env na raiz do projeto após iniciar o bot pela primeira vez ele vai se parecer com isso : </br>
+        # CONFIGURAÇÃO DE API KEYS PARA COMANDOS
 
-| Criador de Sticker |                Recursos        |
-| :-----------: | :--------------------------------: |
-|       ✅       | Foto para Sticker     |
-|       ✅       | Sticker para foto              |
-|       ✅       | Texto para Sticker                  |
-|       ✅       | Texto para Sticker Animado                 |
-|       ✅       | Video/GIF para Sticker |
-|       ✅       | Foto para Sticker (Sem fundo) |
+        # ACRCLOUD - Coloque abaixo suas chaves do ACRCloud (Reconhecimento de Músicas)
+        acr_host=?????
+        acr_access_key=?????
+        acr_access_secret=?????
 
-### Downloads 
+        # DEEPGRAM - Coloque abaixo sua chave do DEEPGRAM (Transcrição de aúdio para texto)
+        dg_secret_key=??????
 
-| Downloads      |                Recursos            |
-| :------------: | :---------------------------------------------: |
-|       ✅        |   Download de aúdio/videos (Youtube)    |
-|       ✅        |   Download de imagens/videos (Instagram)  |
-|       ✅        |   Download de imagens/videos (Twitter)            |
-|       ✅        |   Download de videos (Facebook)            |
-|       ✅        |   Download de videos (Tiktok)            |
-|       ✅        |   Pesquisa/Download de Imagens                  |
 
-### Utilidades Gerais
-
-| Utilitários |                     Recursos            |
-| :------------: | :---------------------------------------------: |
-|       ✅       | Efeitos de Aúdio
-|       ✅        |   Texto para voz                   |
-|       ✅        |   Letra de Música              |
-|       ✅        |   Reconhecimento de músicas                 |
-|       ✅        |   Detector de DDD             |
-|       ✅        |   Consulta de Clima/Previsão do Tempo            |
-|       ✅        |   Conversão de Moedas           |
-|       ✅        |   Calculadora básica           |
-|       ✅        |   Pesquisa Web                  |
-|       ✅        |   Detector Anime                  |
-|       ✅        |   Lançamentos recentes  - Animes                 |
-|       ✅        |   Rastreamento Correios                  |
-|       ✅        |   Noticias Atuais                 |
-|       ✅        |   Tradutor                |
-
-### Administração de Grupo
-
-| Apenas Grupo  |                     Recursos             |
-| :------------: | :---------------------------------------------: |
-|       ✅        |   Promover usuário                  |
-|       ✅        |   Rebaixar usuário                |
-|       ✅        |   Remover usuário                     |
-|       ✅        |   Adicionar usuário                      |
-|       ✅        |   Marcar todos              |
-|       ✅        |   Obter link do grupo               |
-|       ✅        |   Redefinir link do grupo               |
-|       ✅        |   Obter lista de administradores               |
-|       ✅        |   Obter dono do grupo              |
-|       ✅        |   Lista Negra  |
-|       ✅        |   Mutar Grupo
-|       ✅        |   Bem Vindo  |
-|       ✅        |   Auto Sticker |
-|       ✅        |   Anti Trava |
-|       ✅        |   Anti Pornô |
-|       ✅        |   Anti Fake |
-|       ✅        |   Anti Link  |
-|       ✅        |   Anti Flood  |
-|       ✅        |   Contagem de mensagens |
-|       ✅        |   Marcar inativos |
-|       ✅        |   Banir inativos |
-|       ✅        |   Bloquear/Desbloquear Comandos |
-|       ✅        |   Votação de Ban |
-|       ✅        |   Enquete |
-|       ✅        |   Banir Todos  |
-|       ✅        |   Apagar mensagens do bot  |
-
-### Administração de Dono
-
-| Apenas Dono do Bot  |              Recurso           |
-| :------------: | :---------------------------------------------: |
-|       ✅        |   Entrar em um grupo                 |
-|       ✅        |   Sair de todos os grupos                  |
-|       ✅        |   Limpar todos os chats              |
-|       ✅        |   Broadcast - Anuncio Geral                     |
-|       ✅        |   Bloquear/Desbloquear usuário                     |
-|       ✅        |   Sistema de Tipos de Usuários        |
-|       ✅        |   Limitador comandos diários (por usuário)            |
-|       ✅        |   Limitador de comandos por minuto (por usuário)          |
-|       ✅        |   Limitador de mensagens privadas (Anti-flood)    |
-|       ✅        |   Auto Sticker Privado   |
-|       ✅        |   Anti Trava Privado   |
-|       ✅        |   Sair do grupo                     |
-|       ✅        |   Limpar somente chat de contatos                 |
-|       ✅        |   Obter lista de usuários bloqueados                |
-|       ✅        |   Modificar status atual do bot                |
+#### Como configurar o ADMINISTRADOR :
+Para usar as funções de **ADMINISTRADOR** digite **!admin** pela primeira vez ao iniciar ao BOT e ai seu número será cadastrado como dono.<br><br>
+Pronto, agora você tem acesso aos comandos de **ADMIN**. Use **!nomebot**, **!nomeadm**, **!nomesticker** para personalizar o nome do seu bot em menus e em stickers, e veja todos os comandos de administrador com o **!admin**.
 
 <br>
 
-## 7 - Solução de Problemas :
-
-#### SOLUÇÃO DE PROBLEMAS - WINDOWS :
-Só faça os passos abaixo se você tiver algum erro :
-
-- Se houver um erro na inicialização ou o comando !yt não funcionar corretamente, faça a instalação do Google Chrome : https://www.google.com/intl/pt-BR/chrome/
-
-
-#### SOLUÇÃO DE PROBLEMAS - LINUX :
-Só faça os passos abaixo se você tiver algum erro :
-
-- Se houve algum problema na inicialização do script, instale o Google Chrome:
-   ```bash
-    wget https://dl.google.com/linux/direct/google-chrome-stable_current_amd64.deb
-    sudo apt install ./google-chrome-stable_current_amd64.deb
-    ```
-
-- Se houver algum erro relacionado a permissão ao tentar usar o  "npm i"
-    ```bash
-    npm i --unsafe-perm
-    ```
-
-**Obs**: Não conseguiu resolver? Entre em contato no [Passo 8](https://github.com/victorsouzaleal/lbot-whatsapp#8---d%C3%BAvidas)
+#### Como obter as chaves API para usar em comandos específicos :
+Para usar comandos específicos como **!qualmusica** e **!ouvir** é necessário antes configurar as chaves de API no .env, abaixo tem um guia completo com imagens para obter as chaves.<br><br>
+**Informações detalhadas sobre como obter as chaves do NewsAPI(Notícias), ACRCloud(Reconhecimento de Músicas) e DEEPGRAM (Áudio para texto)** :  [Clique AQUI](docs/CHAVESAPI.md)
 
 <br>
 
-## 8 - Agradecimentos
-* [`open-wa/wa-automate-nodejs`](https://github.com/open-wa/wa-automate-nodejs)
-* [`MhankBarBar/whatsapp-bot`](https://github.com/MhankBarBar/whatsapp-bot)
+## 5 - 🛠️ Recursos/Comandos :
+
+### 🖼️ Figurinhas
+- Foto para sticker ✅
+- Video/gif para sticker ✅
+- Texto para sticker ✅
+- Sticker para foto ✅
+- Renomear sticker ✅
+- Auto sticker ✅
+
+### 📥 Downloads 
+- Youtube (video/audio) ✅
+- Facebook (video) ✅
+- Instagram (video/imagem) ✅
+- Twitter (video/imagem) ✅
+- Tiktok (video) ✅
+- Google (imagem) ✅
+
+
+### ⚒️ Utilidades Gerais
+- Chat-GPT ✅
+- Criação de imagens IA ✅
+- Têndencias de Filmes/Séries ✅
+- Encurtar Links ✅
+- Upload de imagens ✅
+- Efeitos de Aúdio ✅
+- Texto para voz ✅
+- Áudio para texto ✅
+- Letra de Música ✅
+- Reconhecimento de músicas ✅ 
+- Detector de DDD ✅
+- Consulta de Clima/Previsão do Tempo ✅
+- Conversão de Moedas ✅
+- Calculadora ✅
+- Pesquisa Google ✅      
+- Detector Anime ✅     
+- Rastreamento Correios ✅ 
+- Noticias Google ✅ 
+- Tradutor Google ✅
+
+<br>
+
+### 👉 E muito mais... [Clique AQUI](docs/COMANDOS.md)
+
+<br>
+
+## 6 - 👤 Contato
+Fiquem a vontade para tirar dúvida, ou se quiser ajudar com ideia ou com qualquer valor para o projeto. O projeto sempre será gratuito, mas não nego uma ajudinha para pagar a internet pelo menos hehe
+
+* **Discord :** victorsouzaleal
+* **Email :** victorsouzaleal@gmail.com
+
+<br>
+
+## 7 - 🙏 Agradecimentos/Contribuições
+
+* [`WhiskeySockets/Baileys`](https://github.com/WhiskeySockets/Baileys) - Biblioteca Baileys.
+* [`Samuel/samucacastro`](https://github.com/samucacastro) - Desenvolvimento de API's
+
