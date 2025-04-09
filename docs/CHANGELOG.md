@@ -1,6 +1,80 @@
 # Notas de atualização
 Colocarei neste arquivos as mudanças significativas em cada versão começando na versão 3.0.0
 
+## 3.1.5 - 04/04/2025
+
+### CORREÇÕES
+- Correção na escolha de método de autenticação no Termux
+
+## 3.1.4 - 04/04/2025
+
+### GERAL
+- Adicionado suporte a código de pareamento, quando iniciar o bot pela primeira vez será perguntado se deseja se conectar pelo QR Code ou Código de pareamento.
+- Removida a necessidade de configurar API Key para funcionamento de certos comandos.
+- Erros de chamadas externas de API/Bibliotecas agoras são exibidas no console.
+- Novo recurso de grupo para **filtrar palavras e deletar mensagem** se alguma palavra do filtro for detectada.
+
+### COMANDOS
+- Novo comando de admin **!modoadmin** para apenas administradores do bot conseguirem usar comandos.
+- Novo comando de grupo **!rmaviso** para remover aviso de um membro.
+- Novo comando de grupo **!zeraravisos** para zerar os avisos de todos os membros.
+- Novo comando de grupo **!addfiltros** para adicionar palavras ao filtro do grupo.
+- Novo comando de grupo **!rmfiltros** para remover palavas do filtro do grupo.
+- Comando **!grupo** agora também exibe os filtros de palavras ativos no grupo.
+- Suporte ao campeonato de 2025 no comando **!brasileirao**.
+
+### CORREÇÕES
+- Correção na reprodução do video no comando **!qualanime**
+
+
+## 3.1.3 - 31/03/2025
+
+### COMANDOS
+- Comando **!ia** foi adicionado novamente
+- Comando **!criarimg** foi adicionado novamente
+
+### CORREÇÕES
+- Correção na mensagem de espera do comando **!play**
+- Correção no problema de download dos comandos **!play** e **!yt**
+- Correção no antiflood que ficava sempre ativo mesmo ele estando desativado.
+
+
+## 3.1.2 - 29/03/2025
+
+### CORREÇÕES
+- Corrigida a sincronização inicial de grupos e da lista negra
+- Corrigida resposta quando não encontra nenhuma letra de música pelo comando **!letra**
+
+
+## 3.1.1 - 28/03/2025
+
+### CORREÇÕES
+- Corrigida a atualização de grupos quando o bot inicia, agora ele remove corretamente os participantes do banco de dados que já sairam do grupo.
+- Corrigido banimento do comando **!aviso**, agora ao chegar aos 3 avisos ele irá banir corretamente e adicionar a lista negra.
+
+
+## 3.1.0 - 28/03/2025
+
+### GERAL
+- Reorganização na estrutura do projeto para me facilitar na manutenção.
+- O atualizador agora verifica se a versão nova é compativel com os dados atuais, caso não seja será perguntado se deseja instalar a versão nova e deletar os dados antigos.
+- Implementação de banco de dados para guardar os dados de participantes dos grupos.
+
+### COMANDOS
+- Comando **!menu** agora não exibe a categoria grupo quando é usado no privado.
+- Comando **!contador** foi removido e agora o contador já está integrado com o grupo.
+- Comando **!atividade** foi renomeado para **!membro** e foram adicionadas informações adicionais sobre o membro do grupo.
+- Comando **!verusuario** foi renomeado para **!usuario**
+- Comando **!veradmins** foi renomeado para **!admins**
+- Comando **!vergrupos** foi renomeado para **!grupos**
+- Novo comando de grupo **!aviso** (Se o membro receber 3 avisos será automaticamente adicionado a lista negra).
+
+### CORREÇÕES
+- Corrigida a resposta do comando **!par**
+- Modificado visual do menu para corrigir o visual quebrado em alguns navegadores no PC.
+- Corrigida falha que se o usuário fosse bloqueado pelo bot ele não passava pelos filtros dos recursos de segurança do grupo.
+
+
 ## 3.0.2 - 24/03/2025
 
 ### GERAL

@@ -11,14 +11,13 @@
 </p>
 
 <br>
-
-<h2 align="center"> 📱 Quer usar o bot? <a href="https://wa.me/5521999121990">AQUI</a> </h2>
-<h2 align="center"> 🔄 Notas de atualização: <a href="https://github.com/victorsouzaleal/lbot-whatsapp/blob/main/docs/CHANGELOG.md">AQUI</a>  </h2>
+<h2 align="center"> 📱 Quer utilizar o bot no privado? <a href="https://wa.me/553497079608">AQUI</a> </h2>
+<h2 align="center"> 🔄 Notas de atualização: <a href="https://github.com/victorsouzaleal/lbot-whatsapp/blob/main/docs/CHANGELOG.md">AQUI</a></h2>
 
 <br>
 
 ## 🚨 REQUERIMENTOS :
-- Um **número de celular conectado ao WhatsApp** para ler o QR Code e conectar o bot. <br>
+- Um **número de celular conectado ao WhatsApp** para conectar o bot. <br>
 - Um **computador com sistema Windows/Linux** ou um **smartphone Android** para executar a aplicação.<br>
 
 <br>
@@ -31,51 +30,55 @@ Antes da instalação você tem que instalar os programas abaixo, no Windows é 
 - Git 64-bit - [DOWNLOAD](https://git-scm.com/downloads/win)<br>
 - Node.js LTS - [DOWNLOAD](https://nodejs.org/en/)<br><br>
 
+<br>
+
+Após instalar o Git e o Node.js no sistema, use o comando abaixo para instalar o **Yarn**
+```bash
+npm i -g yarn
+```
+
+**OBS**: Caso o comando retorne erro no **Linux** você vai precisar se elevar a superusuário utilizando **sudo** antes do comando.
+
+<br>
 
 Faça o download do **.zip** da última versão lançada: [AQUI](https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest)
 
 <br>
 
-Extraia o **.zip**, entre na pasta e abra o **terminal/prompt de comando** do seu sistema **dentro dessa pasta** para executar o comando abaixo:
-
-```bash
-npm i -g yarn && yarn install
-```
-<br>
-
-**OBS**: Caso o comando retorne erro no **Linux** você vai precisar se elevar a superusuário utilizando **sudo** antes do comando.<br><br>
-
-Quando o comando terminar você pode iniciar o bot com o comando abaixo:
+Extraia o **.zip**, entre na pasta e abra o **terminal/prompt de comando** do seu sistema **dentro dessa pasta** e inicie o bot com o abaixo:
 ```bash
 yarn start
 ```
+
 <br>
 
-Se tudo der certo será solicitado para ler o QR Code no terminal, pegue seu celular e faça a leitura do QR Code com seu aplicativo do **WhatsApp**.
+É normal demorar na primeira vez será feito o download de todas as dependências, se tudo der certo será perguntado se você quer se conectar com **QR Code** ou **Código de Pareamento**, faça a sua escolha e se conecte com o aplicativo do WhatsApp. 
 
 <br>
 
 ### 📱 Termux :
 
-Faça a instalação do .apk mais atual do Termux: [AQUI](https://github.com/termux/termux-app/releases/download/v0.118.1/termux-app_v0.118.1+github-debug_universal.apk).
+Faça a instalação do .apk mais atual do Termux: [AQUI](https://github.com/termux/termux-app/releases/download/v0.118.2/termux-app_v0.118.2+github-debug_universal.apk).
 
 <br>
 
-Abra o **Termux** comece usando este comando para instalar automaticamente o bot, isso pode demorar algum tempo até instalar tudo.
+Abra o **Termux** comece usando este comando para fazer o download e instalação do bot, isso pode demorar algum tempo até instalar tudo.
 ```bash
-pkg install wget -y && wget -O - bit.ly/lbot-whatsapp | bash
+pkg install wget -y && wget -O - https://bit.ly/lbot-termux | bash && cd ~/LBOT && yarn start
 ```
 <br>
 
-Se tudo der certo será solicitado para ler o QR Code no terminal, pegue seu celular e faça a leitura do QR Code com seu aplicativo do **WhatsApp**.<br><br>
+É normal demorar na primeira vez será feito o download de todas as dependências, se tudo der certo será perguntado se você quer se conectar com **QR Code** ou **Código de Pareamento**, faça a sua escolha e se conecte com o aplicativo do WhatsApp. 
+
+<br>
 
 Caso você feche o Termux e queira iniciar o bot novamente faça o comando abaixo:
 ```bash
-cd LBOT && yarn start
+cd ~/LBOT && yarn start
 ```
 
-
-<br><br>
+<br>
+<br>
 
 ## 2 - 🤖 Uso :
 
@@ -98,11 +101,6 @@ Todos os comandos tem um guia ao digitar: **!comando** guia
 Para usar as funções de **administrador** digite **!admin** pela primeira vez ao iniciar ao bot e ai seu número será cadastrado como dono.<br><br>
 Pronto, agora você tem acesso aos comandos de **ADMIN**. Use **!nomebot**, **!nomeautor**, **!nomepack** para personalizar o nome do seu bot em menus e em stickers, e veja todos os comandos de administrador com o **!admin**.<br><br>
 
-### Como obter as chaves API para uso em comandos específicos :
-Para usar comandos específicos como **!qualmusica** e **!ouvir** é necessário antes configurar as chaves de API, abaixo tem um guia completo com imagens para obter as chaves.<br>
-
-**Informações detalhadas sobre como obter as chaves do ACRCloud(Reconhecimento de Músicas) e DEEPGRAM (Áudio para texto)** :  [Clique Aqui](docs/CHAVESAPI.md)
-
 <br>
 
 ## 4 - 🛠️ Recursos/Comandos :
@@ -124,6 +122,8 @@ Para usar comandos específicos como **!qualmusica** e **!ouvir** é necessário
 - Google (imagem)
 
 ### ⚒️ Utilidades Gerais
+- Respostas de IA
+- Criar imagem com IA
 - Pesquisa na Steam verde
 - Brasileirão A/B 
 - Têndencias de filmes/séries
@@ -135,8 +135,8 @@ Para usar comandos específicos como **!qualmusica** e **!ouvir** é necessário
 - Letra de música 
 - Reconhecimento de músicas  
 - Detector de DDD 
-- Detector anime 
-- Consulta de Clima/Previsão do Tempo
+- Detector de anime 
+- Clima/Previsão do Tempo
 - Conversão de moedas
 - Calculadora 
 - Pesquisa Google      
@@ -150,8 +150,7 @@ Para usar comandos específicos como **!qualmusica** e **!ouvir** é necessário
 <br>
 
 ## 5 - 👤 Contato
-Caso tenha algum problema ou queira ajudar de alguma forma com o projeto. Estou também procurando alguem que possa oferecer um número de WhatsApp
-para eu deixar o bot rodando para o público.
+Caso tenha algum problema ou queira ajudar de alguma forma com o projeto. 
 
 * **Email**: victorsouzaleal@gmail.com
 * **WhatsApp (NÃO É O BOT, É MEU CONTATO PESSOAL PELO AMOR DE DEUS)**: https://wa.me/5521995612287
