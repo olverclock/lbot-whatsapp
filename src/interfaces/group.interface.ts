@@ -11,16 +11,29 @@ export interface Group {
         status: boolean
         msg : string
     },
-    antifake: {
-        status: boolean
-        allowed : string[]
+    antifake: { 
+        status: boolean, 
+        exceptions: {
+            prefixes: string[],
+            numbers: string[]
+        }
     },
-    antilink: boolean
+    antilink: {
+        status: boolean,
+        exceptions: string[]
+    },
     antiflood: {
         status: boolean
         max_messages: number
         interval: number
     },
+    auto_reply: {
+        status: boolean,
+        config: {
+            word: string,
+            reply: string
+        }[]
+    }
     autosticker: boolean
     block_cmds: string[]
     blacklist : string[]

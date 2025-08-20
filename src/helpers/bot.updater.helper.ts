@@ -1,32 +1,39 @@
-import { updaterLib } from "../libraries/library.js";
+import * as updaterUtil from "../utils/updater.util.js";
 import { colorText, getCurrentBotVersion } from "../utils/general.util.js";
-import getBotTexts from "../helpers/bot.texts.helper.js";
+import botTexts from "../helpers/bot.texts.helper.js";
 import { BotController } from "../controllers/bot.controller.js";
 import fs from 'fs-extra'
-import databaseRebuilder from "./database.rebuilder.helper.js";
+import databaseMigration from "./database.migrate.helper.js";
 
 export async function botUpdater(){
-    const botTexts = getBotTexts(new BotController().getBot())
+    const botController = new BotController()
+    const botInfo = botController.getBot()
     let hasBotUpdated = false
-    
+
     try{
+        if (!botInfo.db_migrated || process.env.migrate) {
+            await databaseMigration()
+            botController.setDbMigrated(true)
+            console.log(colorText(botTexts.migrating_database, '#e0e031'))
+        }
+
         const currentVersion = getCurrentBotVersion()
-        const checkUpdate = await updaterLib.checkUpdate(currentVersion)
+        const checkUpdate = await updaterUtil.checkUpdate(currentVersion)
 
         if (checkUpdate.latest) {
-            console.log("[ATUALIZAÇÃO]", colorText(botTexts.no_update_available))
+            console.log(colorText(botTexts.no_update_available))
         } else {
-            console.log("[ATUALIZAÇÃO]", colorText(botTexts.update_available, '#e0e031'))
+            console.log(colorText(botTexts.update_available, '#e0e031'))
             fs.removeSync('./dist')
-            await updaterLib.makeUpdate('./')
-            await databaseRebuilder()
-            console.log("[ATUALIZAÇÃO]", colorText(botTexts.bot_updated))
+            await updaterUtil.makeUpdate('./')
+            botController.setDbMigrated(false)
+            console.log(colorText(botTexts.bot_updated))
             hasBotUpdated = true
         }
         
         return hasBotUpdated
     } catch(err){
-        console.log("[ATUALIZAÇÃO]", colorText(botTexts.error_check_update, '#e0e031'))
+        console.log("[botUpdater]", colorText(botTexts.error_check_update, "#d63e3e"))
         return hasBotUpdated
     }
 }

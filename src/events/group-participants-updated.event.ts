@@ -3,8 +3,8 @@ import { buildText, showConsoleError} from '../utils/general.util.js'
 import { Bot } from '../interfaces/bot.interface.js'
 import { Group } from '../interfaces/group.interface.js'
 import { GroupController } from '../controllers/group.controller.js'
-import getBotTexts from '../helpers/bot.texts.helper.js'
-import { waLib } from '../libraries/library.js'
+import botTexts from '../helpers/bot.texts.helper.js'
+import { removeParticipant, sendTextWithMentions, removeWhatsappSuffix, addWhatsappSuffix } from '../utils/whatsapp.util.js'
 
 export async function groupParticipantsUpdated (client: WASocket, event: {id: string, author: string, participants: string[], action: ParticipantAction}, botInfo: Bot){
     try{
@@ -19,46 +19,32 @@ export async function groupParticipantsUpdated (client: WASocket, event: {id: st
         if (event.action === 'add') {
             const isParticipant = await groupController.isParticipant(group.id, event.participants[0])
 
-            if (isParticipant) {
-                return
-            } else if (await isParticipantBlacklisted(client, botInfo, group, event.participants[0])){
-                return
-            } else if (await isParticipantFake(client, botInfo, group, event.participants[0])) {
-                return
-            }
+            if (isParticipant) return
 
+            if (await isParticipantBlacklisted(client, botInfo, group, event.participants[0])) return
+            else if (await isParticipantFake(client, botInfo, group, event.participants[0])) return
+            
             await sendWelcome(client, group, botInfo, event.participants[0])
             await groupController.addParticipant(group.id, event.participants[0])
-
         } else if (event.action === "remove"){
             const isParticipant = await groupController.isParticipant(group.id, event.participants[0])
 
-            if (!isParticipant) {
-                return
-            } else if (isBotUpdate){
-                await groupController.removeGroup(event.id)
-            } else {
-                await groupController.removeParticipant(group.id, event.participants[0])
-            }
-
+            if (!isParticipant) return
+            
+            if (isBotUpdate) await groupController.removeGroup(event.id)
+            else await groupController.removeParticipant(group.id, event.participants[0])
         } else if (event.action === "promote"){
             const isAdmin = await groupController.isParticipantAdmin(group.id, event.participants[0])
 
-            if (isAdmin) {
-                return
-            }
-
-            await groupController.addAdmin(event.id, event.participants[0])
-
+            if (isAdmin) return
+        
+            await groupController.setAdmin(event.id, event.participants[0], true)
         } else if (event.action === "demote"){
             const isAdmin = await groupController.isParticipantAdmin(group.id, event.participants[0])
 
-            if (!isAdmin) {
-                return
-            }
+            if (!isAdmin) return
             
-            await groupController.removeAdmin(event.id, event.participants[0])
-
+            await groupController.setAdmin(event.id, event.participants[0], false)
         }
     } catch(err: any){
         showConsoleError(err, "GROUP-PARTICIPANTS-UPDATE")
@@ -68,14 +54,13 @@ export async function groupParticipantsUpdated (client: WASocket, event: {id: st
 
 async function isParticipantBlacklisted(client: WASocket, botInfo: Bot, group: Group, userId: string){
     const groupController = new GroupController()
-    const isUserBlacklisted = await groupController.isBlackListed(group.id, userId)
-    const botTexts = getBotTexts(botInfo)
+    const isUserBlacklisted = group.blacklist.includes(userId)
     const isBotAdmin = botInfo.host_number ? await groupController.isParticipantAdmin(group.id, botInfo.host_number) : false
 
     if (isBotAdmin && isUserBlacklisted) {
-        const replyText = buildText(botTexts.blacklist_ban_message, waLib.removeWhatsappSuffix(userId), botInfo.name)
-        await waLib.removeParticipant(client, group.id, userId)
-        await waLib.sendTextWithMentions(client, group.id, replyText, [userId], {expiration: group.expiration})
+        const replyText = buildText(botTexts.blacklist_ban_message, removeWhatsappSuffix(userId), botInfo.name)
+        await removeParticipant(client, group.id, userId)
+        await sendTextWithMentions(client, group.id, replyText, [userId], {expiration: group.expiration})
         return true
     }
 
@@ -90,17 +75,19 @@ async function isParticipantFake(client: WASocket, botInfo: Bot, group: Group, u
         const isBotNumber = userId == botInfo.host_number
         
         if (isBotAdmin){
-            const isFake = groupController.isNumberFake(group, userId)
+            const allowedPrefixes = group.antifake.exceptions.prefixes
+            const allowedNumbers = group.antifake.exceptions.numbers
+            const isAllowedPrefix = allowedPrefixes.filter(numberPrefix => userId.startsWith(numberPrefix)).length ? true : false
+            const isAllowedNumber = allowedNumbers.filter(userNumber => addWhatsappSuffix(userNumber) == userId).length ? true : false
 
-            if (isFake && !isBotNumber && !isGroupAdmin){
-                const botTexts = getBotTexts(botInfo)
-                const replyText = buildText(botTexts.antifake_ban_message, waLib.removeWhatsappSuffix(userId), botInfo.name)
-                await waLib.sendTextWithMentions(client, group.id, replyText , [userId], {expiration: group.expiration})
-                await waLib.removeParticipant(client, group.id, userId)
+            if (!isAllowedPrefix && !isAllowedNumber && !isBotNumber && !isGroupAdmin){
+                const replyText = buildText(botTexts.antifake_ban_message, removeWhatsappSuffix(userId), botInfo.name)
+                await sendTextWithMentions(client, group.id, replyText , [userId], {expiration: group.expiration})
+                await removeParticipant(client, group.id, userId)
                 return true
             }
         } else {
-            await groupController.setAntiFake(group.id, false, [])
+            await groupController.setAntiFake(group.id, false)
         }
     }
 
@@ -109,9 +96,8 @@ async function isParticipantFake(client: WASocket, botInfo: Bot, group: Group, u
 
 async function sendWelcome(client: WASocket, group: Group, botInfo: Bot, userId: string){
     if (group.welcome.status) {
-        const botTexts = getBotTexts(botInfo)
         const customMessage = group.welcome.msg ?  group.welcome.msg + "\n\n" : ""
-        const welcomeMessage = buildText(botTexts.group_welcome_message, waLib.removeWhatsappSuffix(userId), group.name, customMessage)
-        await waLib.sendTextWithMentions(client, group.id, welcomeMessage, [userId], {expiration: group.expiration})
+        const welcomeMessage = buildText(botTexts.group_welcome_message, removeWhatsappSuffix(userId), group.name, customMessage)
+        await sendTextWithMentions(client, group.id, welcomeMessage, [userId], {expiration: group.expiration})
     }
 }

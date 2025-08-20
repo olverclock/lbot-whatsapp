@@ -2,11 +2,11 @@ import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
 import crypto from 'node:crypto'
 import webp from "node-webpmux"
-import {getTempPath, showConsoleLibraryError} from '../utils/general.util.js'
+import {getTempPath, showConsoleLibraryError} from './general.util.js'
 import {fileTypeFromBuffer} from 'file-type'
 import jimp from 'jimp'
 import { StickerOptions, StickerType } from "../interfaces/library.interface.js"
-import getBotTexts from '../helpers/bot.texts.helper.js'
+import botTexts from '../helpers/bot.texts.helper.js'
 
 export async function createSticker(mediaBuffer : Buffer, {pack = 'LBOT', author = 'LBOT Stickers', fps = 9, type = 'resize'}: StickerOptions){
     try {
@@ -15,7 +15,7 @@ export async function createSticker(mediaBuffer : Buffer, {pack = 'LBOT', author
         return bufferSticker
     } catch(err){
         showConsoleLibraryError(err, 'createSticker')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -26,7 +26,7 @@ export async function renameSticker(stickerBuffer: Buffer, pack: string, author:
         return stickerBufferModified
     } catch(err){
         showConsoleLibraryError(err, 'renameSticker')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -50,7 +50,7 @@ export async function stickerToImage(stickerBuffer: Buffer){
         return imageBuffer
     } catch(err){
         showConsoleLibraryError(err, 'stickerToImage')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -64,6 +64,9 @@ async function stickerCreation(mediaBuffer : Buffer, {author, pack, fps, type} :
 
         const mime = bufferData.mime
         const isAnimated = mime.startsWith('video') || mime.includes('gif') 
+
+        if (mime == 'image/webp') mediaBuffer = await pngConvertion(mediaBuffer)
+
         const webpBuffer = await webpConvertion(mediaBuffer, isAnimated, fps, type)
         const stickerBuffer = await addExif(webpBuffer, pack, author)
 
@@ -88,6 +91,32 @@ async function addExif(buffer: Buffer, pack: string, author: string){
 
         return stickerBuffer
     } catch(err){
+        throw err
+    }
+}
+
+async function pngConvertion(mediaBuffer : Buffer){
+    try {
+        const inputMediaPath = getTempPath('webp')
+        const outputMediaPath = getTempPath('png')
+        fs.writeFileSync(inputMediaPath, mediaBuffer)
+        
+        await new Promise <void>((resolve, reject) => {
+            ffmpeg(inputMediaPath)
+            .save(outputMediaPath)
+            .on('end', () => resolve())
+            .on('error', (err) => reject(err))
+        }).catch((err)=>{
+            fs.unlinkSync(inputMediaPath)
+            throw err
+        })
+
+        const pngBuffer = fs.readFileSync(outputMediaPath)
+        fs.unlinkSync(outputMediaPath)
+        fs.unlinkSync(inputMediaPath)
+
+        return pngBuffer
+    } catch(err) {
         throw err
     }
 }

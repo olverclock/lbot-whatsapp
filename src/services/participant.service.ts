@@ -1,13 +1,32 @@
 import { Participant, Group } from "../interfaces/group.interface.js";
 import { MessageTypes } from "../interfaces/message.interface.js";
-import { timestampToDate, buildText } from '../utils/general.util.js'
+import { deepMerge, timestampToDate } from '../utils/general.util.js'
 import moment from 'moment-timezone'
 import DataStore from "@seald-io/nedb";
-import { GroupMetadata, GroupParticipant } from "baileys";
+import { GroupMetadata } from "baileys";
 
 const db = new DataStore<Participant>({filename : './storage/participants.groups.db', autoload: true})
 
 export class ParticipantService {
+    private defaultParticipant : Participant = {
+        group_id : '',
+        user_id: '',
+        registered_since: timestampToDate(moment.now()),
+        commands: 0,
+        admin: false,
+        msgs: 0,
+        image: 0,
+        audio: 0,
+        sticker: 0,
+        video: 0,
+        text: 0,
+        other: 0,
+        warnings: 0,
+        antiflood : {
+            expire: 0,
+            msgs: 0
+        }
+    }
 
     public async syncParticipants(groupMeta: GroupMetadata){
         //Adiciona participantes no banco de dados que entraram enquanto o bot estava off.
@@ -35,85 +54,38 @@ export class ParticipantService {
     public async addParticipant(groupId: string, userId: string, isAdmin: boolean){
         const isGroupParticipant = await this.isGroupParticipant(groupId, userId)
 
-        if (isGroupParticipant) {
-            return
-        }
-
+        if (isGroupParticipant) return
+        
         const participant : Participant = {
+            ...this.defaultParticipant,
             group_id : groupId,
             user_id: userId,
-            registered_since: timestampToDate(moment.now()),
-            commands: 0,
-            admin: isAdmin,
-            msgs: 0,
-            image: 0,
-            audio: 0,
-            sticker: 0,
-            video: 0,
-            text: 0,
-            other: 0,
-            warnings: 0,
-            antiflood : {
-                expire: 0,
-                msgs: 0
-            }
+            admin: isAdmin
         }
 
-        return db.insertAsync(participant)
+        await db.insertAsync(participant)
     }
 
-    public async rebuildParticipants() {
+    public async migrateParticipants() {
         const participants = await this.getAllParticipants()
 
         for (let participant of participants) {
             const oldParticipantData = participant as any
-            const updatedParticipantData : Participant = {
-                group_id : oldParticipantData.group_id,
-                user_id: oldParticipantData.user_id,
-                registered_since: oldParticipantData.registered_since,
-                commands: oldParticipantData.commands,
-                admin: oldParticipantData.admin,
-                msgs: oldParticipantData.msgs ?? 0,
-                image: oldParticipantData.image ?? 0,
-                audio: oldParticipantData.audio ?? 0,
-                sticker: oldParticipantData.sticker ?? 0,
-                video: oldParticipantData.video ?? 0,
-                text: oldParticipantData.text ?? 0,
-                other: oldParticipantData.other ?? 0,
-                warnings: oldParticipantData.warnings ?? 0,
-                antiflood : {
-                    expire: oldParticipantData.antiflood.expire ?? 0,
-                    msgs: oldParticipantData.antiflood.msgs ?? 0
-                }
-            }
-
-            await db.removeAsync({user_id: participant.user_id, group_id: participant.group_id}, {})
-            await db.insertAsync(updatedParticipantData)
+            const updatedParticipantData : Participant =  deepMerge(this.defaultParticipant, oldParticipantData)
+            await db.updateAsync({ group_id: participant.group_id, user_id: participant.user_id }, { $set: updatedParticipantData }, { upsert: true })
         }
     }
 
     public async removeParticipant(groupId: string, userId: string){
-        return db.removeAsync({group_id: groupId, user_id: userId}, {})
+        await db.removeAsync({group_id: groupId, user_id: userId}, {})
     }
 
     public async removeParticipants(groupId: string){
-        return db.removeAsync({group_id: groupId}, {multi: true})
+        await db.removeAsync({group_id: groupId}, {multi: true})
     }
 
-    public async addAdmin(groupId: string, userId: string){
-        const isGroupAdmin = await this.isGroupAdmin(groupId, userId)
-
-        if (!isGroupAdmin) {
-            return db.updateAsync({group_id : groupId, user_id: userId}, { $set: { admin: true }})
-        }
-    }
-
-    public async removeAdmin(groupId: string, userId: string){
-        const isGroupAdmin = await this.isGroupAdmin(groupId, userId)
-
-        if (isGroupAdmin) {
-            return db.updateAsync({group_id : groupId, user_id: userId}, { $set: { admin: false }})
-        }
+    public async setAdmin(groupId: string, userId: string, status: boolean){
+        await db.updateAsync({group_id : groupId, user_id: userId}, { $set: { admin: status }})
     }
 
     public async getParticipantFromGroup(groupId: string, userId: string){
@@ -156,7 +128,7 @@ export class ParticipantService {
         return adminsIds.includes(userId)
     }
 
-    public incrementParticipantActivity(groupId: string, userId: string, type: MessageTypes, isCommand: boolean){
+    public async incrementParticipantActivity(groupId: string, userId: string, type: MessageTypes, isCommand: boolean){
         let incrementedUser : {
             msgs: number,
             commands?: number,
@@ -168,10 +140,8 @@ export class ParticipantService {
             other?: number
         } = { msgs: 1 }
 
-        if(isCommand) {
-            incrementedUser.commands = 1
-        }
-
+        if (isCommand) incrementedUser.commands = 1
+        
         switch (type) {
             case "conversation":
             case "extendedTextMessage":
@@ -194,7 +164,7 @@ export class ParticipantService {
                 break
         }
 
-        return db.updateAsync({group_id : groupId, user_id: userId}, {$inc: incrementedUser})
+        await db.updateAsync({group_id : groupId, user_id: userId}, {$inc: incrementedUser})
     }  
 
     public async getParticipantActivityLowerThan(group: Group, num : number){
@@ -208,27 +178,23 @@ export class ParticipantService {
         return participantsLeaderboard.splice(0, qty_leaderboard)
     }
 
-    public addWarning(groupId: string, userId: string){
-        return db.updateAsync({group_id: groupId, user_id: userId}, { $inc: { warnings: 1} })
+    public async addWarning(groupId: string, userId: string){
+        await db.updateAsync({group_id: groupId, user_id: userId}, { $inc: { warnings: 1} })
     }
 
-    public removeWarning(groupId: string, userId: string, currentWarnings: number){
-        return db.updateAsync({group_id: groupId, user_id: userId}, { $set: { warnings: --currentWarnings} })
+    public async removeWarning(groupId: string, userId: string, currentWarnings: number){
+        await db.updateAsync({group_id: groupId, user_id: userId}, { $set: { warnings: --currentWarnings} })
     }
 
-    public removeParticipantsWarnings(groupId: string){
-        return db.updateAsync({group_id: groupId}, { $set: { warnings: 0} })
+    public async removeParticipantsWarnings(groupId: string){
+        await db.updateAsync({group_id: groupId}, { $set: { warnings: 0} })
     }
 
-    public async hasAntiFloodExpiredMessages(group: Group, participant: Participant, currentTimestamp: number){
-        if (group && currentTimestamp > participant.antiflood.expire){
-            const expireTimestamp = currentTimestamp + group?.antiflood.interval
-            await db.updateAsync({group_id: group.id, user_id: participant.user_id}, { $set : { 'antiflood.expire': expireTimestamp, 'antiflood.msgs': 1 } })
-            return true
-        } else {
-            await db.updateAsync({group_id: group.id, user_id: participant.user_id}, { $inc : { 'antiflood.msgs': 1 } })
-            return false
-        }
+    public async expireParticipantAntiFlood(groupId: string, userId: string, newExpireTimestamp: number){
+        await db.updateAsync({group_id: groupId, user_id: userId}, { $set : { 'antiflood.expire': newExpireTimestamp, 'antiflood.msgs': 1 } })
     }
 
+    public async incrementAntiFloodMessage(groupId: string, userId: string){
+        await db.updateAsync({group_id: groupId, user_id: userId}, { $inc : { 'antiflood.msgs': 1 } })
+    }
 }

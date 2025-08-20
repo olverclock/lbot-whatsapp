@@ -1,48 +1,71 @@
 import { Group } from "../interfaces/group.interface.js";
-import { Bot } from "../interfaces/bot.interface.js";
-import { CategoryCommand } from "../interfaces/command.interface.js";
 import { GroupMetadata } from 'baileys'
-import { buildText } from '../utils/general.util.js'
-import { commandsGroup } from "../commands/group.list.commands.js";
-import { commandExist, getCommandsByCategory } from "../utils/commands.util.js";
-import { waLib } from "../libraries/library.js";
+import { removePrefix } from "../utils/whatsapp.util.js";
 import DataStore from "@seald-io/nedb";
 import { ParticipantService } from "./participant.service.js";
+import { deepMerge } from "../utils/general.util.js";
 
 const db = new DataStore<Group>({filename : './storage/groups.db', autoload: true})
 
 export class GroupService {
     private participantService
 
+    private defaultGroup: Group = {
+        id: '',
+        name: '',
+        description: undefined,
+        commands_executed: 0,
+        owner: undefined,
+        restricted: false,
+        expiration: undefined,
+        muted: false,
+        welcome: { 
+            status: false, 
+            msg: '' 
+        },
+        antifake: { 
+            status: false, 
+            exceptions: {
+                prefixes: ['55'],
+                numbers: []
+            }
+        },
+        antilink: { 
+            status: false, 
+            exceptions: [] 
+        },
+        antiflood: { 
+            status: false, 
+            max_messages: 10, 
+            interval: 10 
+        },
+        auto_reply: {
+            status: false,
+            config: [],
+        },
+        autosticker: false,
+        block_cmds: [],
+        blacklist: [],
+        word_filter: []
+    }
+
     constructor() {
         this.participantService = new ParticipantService()
     }
 
-    // *********************** Registra/Atualiza/Remove grupos ***********************
     public async registerGroup(groupMetadata : GroupMetadata){
-        const isRegistered = await this.isRegistered(groupMetadata.id)
+        const group = await this.getGroup(groupMetadata.id)
 
-        if (isRegistered) {
-            return
-        }
+        if (group) return
 
         const groupData : Group = {
+            ...this.defaultGroup,
             id: groupMetadata.id,
             name: groupMetadata.subject,
             description: groupMetadata.desc,
-            commands_executed: 0,
             owner: groupMetadata.owner,
             restricted: groupMetadata.announce,
-            expiration: groupMetadata.ephemeralDuration,
-            muted : false,
-            welcome : { status: false, msg: '' },
-            antifake : { status: false, allowed: [] },
-            antilink : false,
-            antiflood : { status: false, max_messages: 10, interval: 10},
-            autosticker : false,
-            block_cmds : [],
-            blacklist : [],
-            word_filter: []
+            expiration: groupMetadata.ephemeralDuration
         }
 
         const newGroup = await db.insertAsync(groupData) as Group
@@ -55,42 +78,13 @@ export class GroupService {
         return newGroup
     }
 
-    public async rebuildGroups() {
+    public async migrateGroups() {
         const groups = await this.getAllGroups()
 
-        for (let group of groups) {
+        for (const group of groups) {
             const oldGroupData = group as any
-            const updatedGroupData : Group = {
-                id: oldGroupData.id,
-                name: oldGroupData.name,
-                description : oldGroupData.description,
-                commands_executed: oldGroupData.commands_executed,
-                owner: oldGroupData.owner,
-                restricted: oldGroupData.restricted,
-                expiration: oldGroupData.expiration,
-                muted : oldGroupData.muted ?? false,
-                welcome : { 
-                    status: oldGroupData.welcome.status ?? false,
-                    msg: oldGroupData.welcome.msg ?? '' 
-                },
-                antifake : { 
-                    status:  oldGroupData.antifake.status ?? false, 
-                    allowed: oldGroupData.antifake.allowed ?? [] 
-                },
-                antilink : oldGroupData.antilink ?? false,
-                antiflood : { 
-                    status: oldGroupData.antiflood.status ?? false, 
-                    max_messages: oldGroupData.antiflood.max_messages ?? 10, 
-                    interval: oldGroupData.antiflood.interval ?? 10
-                },
-                autosticker : oldGroupData.autosticker ?? false,
-                block_cmds : oldGroupData.block_cmds ?? [],
-                blacklist : oldGroupData.blacklist ?? [],
-                word_filter: oldGroupData.word_filter ?? []
-            }
-
-            await db.removeAsync({id: group.id}, {})
-            await db.insertAsync(updatedGroupData)
+            const updatedGroupData: Group = deepMerge(this.defaultGroup, oldGroupData)
+            await db.updateAsync({ id: group.id }, { $set: updatedGroupData }, { upsert: true })
         }
     }
 
@@ -105,9 +99,9 @@ export class GroupService {
         
         //Atualizando grupos em que o bot está
         for (let groupMeta of groupsMeta) {
-            const isRegistered = await this.isRegistered(groupMeta.id)
+            const group = await this.getGroup(groupMeta.id)
 
-            if (isRegistered){ // Se o grupo já estiver registrado sincronize os dados do grupo e os participantes.
+            if (group){ // Se o grupo já estiver registrado sincronize os dados do grupo e os participantes.
                 await db.updateAsync({ id : groupMeta.id }, { $set: {
                     name: groupMeta.subject,
                     description: groupMeta.desc,
@@ -117,24 +111,18 @@ export class GroupService {
                 }})
 
                 await this.participantService.syncParticipants(groupMeta)
-    
             } else { // Se o grupo não estiver registrado, faça o registro.
                 await this.registerGroup(groupMeta)
             }
         }
     }
 
-    public updatePartialGroup(group: Partial<GroupMetadata>) {
+    public async updatePartialGroup(group: Partial<GroupMetadata>) {
         if (group.id){
-            if (group.desc) {
-                return this.setDescription(group.id, group.desc)
-            } else if (group.subject) {
-                return this.setName(group.id, group.subject)
-            } else if (group.announce) {
-                return this.setRestricted(group.id, group.announce)
-            } else if (group.ephemeralDuration) {
-                return this.setExpiration(group.id, group.ephemeralDuration)
-            }
+            if (group.desc) await this.setDescription(group.id, group.desc)
+            else if (group.subject) await this.setName(group.id, group.subject)
+            else if (group.announce) await this.setRestricted(group.id, group.announce)
+            else if (group.ephemeralDuration) await this.setExpiration(group.id, group.ephemeralDuration)
         }
     }
 
@@ -143,203 +131,124 @@ export class GroupService {
         return group
     }
 
-    public async removeGroup(groupId: string){
-        await this.participantService.removeParticipants(groupId)
-        return db.removeAsync({id: groupId}, {multi: true})
-    }
-
     public async getAllGroups(){
         const groups = await db.findAsync({}) as Group[]
         return groups
     }
 
-    public async isRegistered(groupId: string) {
-        const group = await this.getGroup(groupId)
-        return (group != null)
+    public async removeGroup(groupId: string){
+        await this.participantService.removeParticipants(groupId)
+        await db.removeAsync({id: groupId}, {multi: true})
     }
 
-    public async isRestricted(groupId: string) {
-        const group = await this.getGroup(groupId)
-        return group?.restricted
+    public async setName(groupId: string, name: string){
+        await db.updateAsync({id: groupId}, { $set : { name } })
     }
 
-    public setName(groupId: string, name: string){
-        return db.updateAsync({id: groupId}, { $set : { name } })
+    public async setRestricted(groupId: string, restricted: boolean){
+        await db.updateAsync({id: groupId}, { $set: { restricted } })
     }
 
-    public setRestricted(groupId: string, restricted: boolean){
-        return db.updateAsync({id: groupId}, { $set: { restricted } })
+    private async setExpiration(groupId: string, expiration: number | undefined){
+        await db.updateAsync({id: groupId}, { $set: { expiration } })
     }
 
-    private setExpiration(groupId: string, expiration: number | undefined){
-        return db.updateAsync({id: groupId}, { $set: { expiration } })
+    public async setDescription(groupId: string, description?: string){
+        await db.updateAsync({id: groupId}, { $set: { description } })
     }
 
-    public setDescription(groupId: string, description?: string){
-        return db.updateAsync({id: groupId}, { $set: { description } })
-    }
-
-    public incrementGroupCommands(groupId: string){
-        return db.updateAsync({id : groupId}, {$inc: {commands_executed: 1}})
+    public async incrementGroupCommands(groupId: string){
+        await db.updateAsync({id : groupId}, {$inc: {commands_executed: 1}})
     } 
 
-    public async getOwner(groupId: string){
-        const group = await this.getGroup(groupId)
-        return group?.owner
-    }
-
-    // *********************** RECURSOS DO GRUPO ***********************
-    // ***** FILTRO DE PALAVRAS *****
-    public addWordFilter(groupId: string, word: string){
-        return db.updateAsync({id: groupId}, { $push: { word_filter : word }})
-    }
-
-    public removeWordFilter(groupId: string, word: string){
-        return db.updateAsync({id: groupId}, { $pull: { word_filter : word }})
-    }
-
-    // ***** BEM-VINDO *****
-    public setWelcome(groupId: string, status: boolean, msg: string){
-        return db.updateAsync({id : groupId}, { $set: { "welcome.status": status, "welcome.msg":msg }})
-    }
-
-    // ***** ANTI-FAKE *****
-    public setAntifake(groupId: string, status: boolean, allowed: string[]){
-        return db.updateAsync({id: groupId}, {$set: { "antifake.status": status, "antifake.allowed": allowed }})
-    }
-
-    public isNumberFake(group: Group, userId: string){
-        const allowedPrefixes = group.antifake.allowed
-        for(let numberPrefix of allowedPrefixes){
-            if (userId.startsWith(numberPrefix)) {
-                return false
-            }
+    public async setWordFilter(groupId: string, word: string, operation: 'add' | 'remove'){
+        if (operation == 'add'){
+            await db.updateAsync({id: groupId}, { $push: { word_filter : word }})
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { word_filter : word }})
         }
-        return true
     }
 
-    // ***** MUTAR GRUPO *****
-    public setMuted(groupId: string, status: boolean){
-        return db.updateAsync({id: groupId}, {$set: { muted : status}})
+    public async setWelcome(groupId: string, status: boolean, msg: string){
+        await db.updateAsync({id : groupId}, { $set: { "welcome.status": status, "welcome.msg":msg }})
     }
 
-    // ***** ANTI-LINK *****
-    public setAntilink(groupId: string, status: boolean){
-        return db.updateAsync({id : groupId}, { $set: { antilink: status } })
+    public async setAutoReply(groupId: string, status: boolean){
+        await db.updateAsync({id: groupId}, {$set: { "auto_reply.status": status}})
     }
 
-    // ***** AUTO-STICKER *****
-    public setAutosticker(groupId: string, status: boolean){
-        return db.updateAsync({id: groupId}, { $set: { autosticker: status } })
+    public async setReplyConfig(groupId: string, word: string, reply: string, operation: 'add' | 'remove') {
+        if (operation == 'add'){
+            await db.updateAsync({id: groupId}, { $push: { "auto_reply.config" : { word, reply } }})
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { "auto_reply.config" : { word, reply } }})
+        }
     }
 
-    // ***** ANTI-FLOOD *****
+    public async setAntifake(groupId: string, status: boolean){
+        await db.updateAsync({id: groupId}, {$set: { "antifake.status": status}})
+    }
+
+    public async setFakePrefixException(groupId: string, numberPrefix: string, operation: 'add' | 'remove'){
+        if (operation == 'add') {
+            await db.updateAsync({id: groupId}, { $push: { "antifake.exceptions.prefixes" : numberPrefix }})
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { "antifake.exceptions.prefixes" : numberPrefix }})
+        }
+    }
+
+    public async setFakeNumberException(groupId: string, userNumber: string, operation: 'add' | 'remove'){
+        if (operation == 'add'){
+            await db.updateAsync({id: groupId}, { $push: { "antifake.exceptions.numbers" : userNumber }})
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { "antifake.exceptions.numbers" : userNumber }})
+        }
+    }
+
+    public async setMuted(groupId: string, status: boolean){
+        await db.updateAsync({id: groupId}, {$set: { muted : status}})
+    }
+
+    public async setAntilink(groupId: string, status: boolean){
+        await db.updateAsync({id: groupId}, { $set: { 'antilink.status': status} })
+    }
+
+    public async setLinkException(groupId: string, exception: string, operation: 'add' | 'remove'){
+        if (operation == 'add') {
+            await db.updateAsync({id: groupId}, { $push: { "antilink.exceptions" : exception }})
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { "antilink.exceptions" : exception }})
+        }
+    }
+
+    public async setAutosticker(groupId: string, status: boolean){
+        await db.updateAsync({id: groupId}, { $set: { autosticker: status } })
+    }
+
     public async setAntiFlood(groupId: string, status: boolean, maxMessages: number, interval: number){
-        return db.updateAsync({id : groupId}, { $set: { 'antiflood.status' : status, 'antiflood.max_messages' : maxMessages, 'antiflood.interval' : interval } })
+        await db.updateAsync({id : groupId}, { $set: { 'antiflood.status' : status, 'antiflood.max_messages' : maxMessages, 'antiflood.interval' : interval } })
     }
 
-    // ***** LISTA-NEGRA *****
-    public async getBlackList(groupId: string){
+    public async setBlacklist(groupId: string, userId: string, operation: 'add' | 'remove'){
+        if (operation == 'add'){
+            await db.updateAsync({id: groupId}, { $push: { blacklist: userId } })
+        } else {
+            await db.updateAsync({id: groupId}, { $pull: { blacklist: userId } } )
+        }
+    }
+
+    public async setBlockedCommands(groupId: string, prefix: string, commands: string[], operation: 'add' | 'remove'){
         const group = await this.getGroup(groupId)
-        return group?.blacklist || []
-    }
+        const commandsWithoutPrefix = commands.map(command => removePrefix(prefix, command))
 
-    public addBlackList(groupId: string, userId: string){
-        return db.updateAsync({id: groupId}, { $push: { blacklist: userId } })
-    }
-
-    public removeBlackList(groupId: string, userId: string){
-        return db.updateAsync({id: groupId}, { $pull: { blacklist: userId } } )
-    }
-
-    public async isBlackListed(groupId: string, userId: string){
-        const list = await this.getBlackList(groupId)
-        return list.includes(userId)
-    }
-
-    // ***** BLOQUEAR/DESBLOQUEAR COMANDOS *****
-    public async blockCommands(group: Group, commands : string[], botInfo: Bot){
-        const { prefix } = botInfo
-        const groupCommands = commandsGroup(botInfo)
-        let blockedCommands : string[] = []
-        let blockResponse = groupCommands.bcmd.msgs.reply_title
-        let categories : CategoryCommand[]  = ['sticker', 'utility', 'download', 'misc']
-
-        if (commands[0] == 'variado') {
-            commands[0] = 'misc'
-        } else if (commands[0] == 'utilidade') {
-            commands[0] = 'utility'
-        } 
-        
-        if (categories.includes(commands[0] as CategoryCommand)) {
-            commands = getCommandsByCategory(botInfo, commands[0] as CategoryCommand)
+        if (operation == 'add'){
+            const blockCommands = commandsWithoutPrefix.filter(command => !group?.block_cmds.includes(command))
+            await db.updateAsync({id: groupId}, { $push: { block_cmds: { $each: blockCommands } } })
+            return blockCommands.map(command => prefix+command)
+        } else {
+            const unblockCommands = commandsWithoutPrefix.filter(command => group?.block_cmds.includes(command))
+            await db.updateAsync({id: groupId}, { $pull: { block_cmds: { $in: unblockCommands }} })
+            return unblockCommands.map(command => prefix+command)
         }
-
-        for (let command of commands) {
-            if (commandExist(botInfo, command, 'utility') || commandExist(botInfo, command, 'misc') || commandExist(botInfo, command, 'sticker') || commandExist(botInfo, command, 'download')) {
-                if (group.block_cmds.includes(waLib.removePrefix(prefix, command))) {
-                    blockResponse += buildText(groupCommands.bcmd.msgs.reply_item_already_blocked, command)
-                } else {
-                    blockedCommands.push(waLib.removePrefix(prefix, command))
-                    blockResponse += buildText(groupCommands.bcmd.msgs.reply_item_blocked, command)
-                }
-            } else if (commandExist(botInfo, command, 'group') || commandExist(botInfo, command, 'admin') || commandExist(botInfo, command, 'info')) {
-                blockResponse += buildText(groupCommands.bcmd.msgs.reply_item_error, command)
-            } else {
-                blockResponse += buildText(groupCommands.bcmd.msgs.reply_item_not_exist, command)
-            }
-        }
-
-        if (blockedCommands.length != 0) {
-            await db.updateAsync({id : group.id}, { $push: { block_cmds: { $each: blockedCommands } } })
-        }
-
-        return blockResponse
     }
-
-    public async unblockCommand(group: Group, commands: string[], botInfo: Bot){
-        const groupCommands = commandsGroup(botInfo)
-        const { prefix } = botInfo
-        let unblockedCommands : string[] = []
-        let unblockResponse = groupCommands.dcmd.msgs.reply_title
-        let categories : CategoryCommand[] | string[] = ['all', 'sticker', 'utility', 'download', 'misc']
-
-        if (commands[0] == 'todos') {
-            commands[0] = 'all'
-        } else if (commands[0] == 'utilidade') {
-            commands[0] = 'utility'
-        } else if (commands[0] == 'variado') {
-            commands[0] = 'misc'
-        } 
-        
-        if (categories.includes(commands[0])) {
-            if (commands[0] === 'all') {
-                commands = group.block_cmds.map(command => prefix + command)
-            } else {
-                commands = getCommandsByCategory(botInfo, commands[0] as CategoryCommand)
-            }
-        }
-
-        for (let command of commands) {
-            if (group.block_cmds.includes(waLib.removePrefix(prefix, command))) {
-                unblockedCommands.push(waLib.removePrefix(prefix, command))
-                unblockResponse += buildText(groupCommands.dcmd.msgs.reply_item_unblocked, command)
-            } else {
-                unblockResponse += buildText(groupCommands.dcmd.msgs.reply_item_not_blocked, command)
-            }
-        }
-
-        if (unblockedCommands.length != 0) {
-            await db.updateAsync({id : group.id}, { $pull: { block_cmds: { $in: unblockedCommands }} })
-        }
-
-        return unblockResponse
-    }
-
-    public isBlockedCommand(group: Group, command: string, botInfo: Bot) {
-        const {prefix} = botInfo
-        return group.block_cmds.includes(waLib.removePrefix(prefix, command))
-    }
-
-
 }

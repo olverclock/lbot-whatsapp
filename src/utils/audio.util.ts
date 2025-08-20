@@ -1,7 +1,7 @@
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
-import {getTempPath, showConsoleLibraryError} from '../utils/general.util.js'
-import { convertMp4ToMp3 } from './convert.library.js'
+import {getTempPath, showConsoleLibraryError} from './general.util.js'
+import { convertMp4ToMp3 } from './convert.util.js'
 import format from 'format-duration'
 import {createClient} from '@deepgram/sdk'
 import tts from 'node-gtts'
@@ -10,7 +10,7 @@ import axios, { AxiosRequestConfig } from 'axios'
 import FormData from 'form-data'
 import { ApiKeys, AudioModificationType, MusicRecognition } from '../interfaces/library.interface.js'
 import crypto from 'node:crypto'
-import getBotTexts from '../helpers/bot.texts.helper.js'
+import botTexts from '../helpers/bot.texts.helper.js'
 
 export async function audioTranscription (audioBuffer : Buffer){
     try {
@@ -20,7 +20,6 @@ export async function audioTranscription (audioBuffer : Buffer){
 
         for (let key of apiKeys.deepgram){
             try {
-                console.log(key)
                 const deepgram = createClient(key.secret_key)
                 const deepgramConfig = {
                     model: 'nova-2',
@@ -43,7 +42,7 @@ export async function audioTranscription (audioBuffer : Buffer){
         throw error
     } catch(err){
         showConsoleLibraryError(err, 'audioTranscription')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -116,7 +115,7 @@ export async function musicRecognition (mediaBuffer : Buffer){
         throw error
     } catch(err){
         showConsoleLibraryError(err, 'musicRecognition')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -134,7 +133,7 @@ export async function textToVoice (lang: "pt" | 'en' | 'ja' | 'es' | 'it' | 'ru'
         return audioBuffer
     } catch(err){
         showConsoleLibraryError(err, 'textToVoice')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -153,10 +152,10 @@ export async function audioModified (audioBuffer: Buffer, type: AudioModificatio
                 options = ["-y", "-filter_complex", "areverse"]
                 break
             case "grave":
-                options = ["-y", "-af", "asetrate=44100*0.8"]
+                options = ["-y", "-af", "asetrate=44100*0.5,aresample=44100,atempo=1.20"]
                 break
             case "agudo":
-                options = ["-y", "-af", "asetrate=44100*1.4"]
+                options = ["-y", "-af", "asetrate=44100*1.1,aresample=44100,atempo=0.70"]
                 break
             case "x2":
                 options = ["-y", "-filter:a", "atempo=2.0", "-vn"]
@@ -187,7 +186,7 @@ export async function audioModified (audioBuffer: Buffer, type: AudioModificatio
         return bufferModifiedAudio
     } catch(err){
         showConsoleLibraryError(err, 'audioTranscription')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 

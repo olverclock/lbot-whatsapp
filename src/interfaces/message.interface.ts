@@ -1,8 +1,8 @@
 import {proto, WAMessage} from 'baileys'
 
-export type MessageTypes = "conversation" | "extendedTextMessage" | "imageMessage" | "documentMessage" | "videoMessage" | "stickerMessage" | "audioMessage"
+export type MessageTypes = keyof proto.IMessage
 
-export type MimeTypes = "audio/mpeg"| "audio/mp4" | "audio/mp3" | "image/png" | "image/webp" | "video/mp4" | "document/pdf" | "application/pdf"
+export type MimeTypes = "audio/mpeg"| "audio/mp4" | "audio/mp3" | "image/png" | "image/webp" | "video/mp4" | "document/pdf" | "application/pdf" | "image/jpeg"
 
 export interface MessageOptions {
     expiration?: number,

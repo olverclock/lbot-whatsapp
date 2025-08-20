@@ -11,28 +11,35 @@
 </p>
 
 <br>
-<h2 align="center"> 📱 Quer utilizar o bot no privado? <a href="https://wa.me/553497079608">AQUI</a> </h2>
+<h2 align="center"> Esse projeto não está sendo mais atualizado</h2>
 <h2 align="center"> 🔄 Notas de atualização: <a href="https://github.com/victorsouzaleal/lbot-whatsapp/blob/main/docs/CHANGELOG.md">AQUI</a></h2>
 
 <br>
 
-## 🚨 REQUERIMENTOS :
+## 🚨 REQUERIMENTOS
+- Conhecimento básico de informática. <br>
 - Um **número de celular conectado ao WhatsApp** para conectar o bot. <br>
 - Um **computador com sistema Windows/Linux** ou um **smartphone Android** para executar a aplicação.<br>
 
 <br>
 
-## 1 - 💿 Instalação :
+## 💿 Instalação
 
-### 🖥️ Windows/Linux :
+### 🖥️ Desktop (Windows/Linux)
 
 Antes da instalação você tem que instalar os programas abaixo, no Windows é só instalar pelo link indicado e no Linux você tem que pesquisar qual é o comando para instalar na sua distribuição.
 - Git 64-bit - [DOWNLOAD](https://git-scm.com/downloads/win)<br>
 - Node.js LTS - [DOWNLOAD](https://nodejs.org/en/)<br><br>
 
+Faça o download do **.zip** da última versão lançada [AQUI](https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest), extraia o **.zip** e abra o **terminal/prompt de comando** dentro do local extraído.
+
 <br>
 
-Após instalar o Git e o Node.js no sistema, use o comando abaixo para instalar o **Yarn**
+**TODOS OS COMANDOS ABAIXO DEVEM SER EXECUTADOS NO TERMINAL/PROMPT DE COMANDO DENTRO DA PASTA EXTRAÍDA DO BOT!!** 
+
+<br>
+
+Se for a sua primeira vez instalando o bot você vai ter que digitar esse comando para instalar o **Yarn**
 ```bash
 npm i -g yarn
 ```
@@ -41,11 +48,7 @@ npm i -g yarn
 
 <br>
 
-Faça o download do **.zip** da última versão lançada: [AQUI](https://github.com/victorsouzaleal/lbot-whatsapp/releases/latest)
-
-<br>
-
-Extraia o **.zip**, entre na pasta e abra o **terminal/prompt de comando** do seu sistema **dentro dessa pasta** e inicie o bot com o abaixo:
+Após instalar o **Yarn** ou se ele já tiver instalado, você só precisa iniciar o bot com o comando abaixo:
 ```bash
 yarn start
 ```
@@ -56,20 +59,19 @@ yarn start
 
 <br>
 
-### 📱 Termux :
+### 📱 Smartphone (Android)
 
 Faça a instalação do .apk mais atual do Termux: [AQUI](https://github.com/termux/termux-app/releases/download/v0.118.2/termux-app_v0.118.2+github-debug_universal.apk).
 
-<br>
-
 Abra o **Termux** comece usando este comando para fazer o download e instalação do bot, isso pode demorar algum tempo até instalar tudo.
 ```bash
-pkg install wget -y && wget -O - https://bit.ly/lbot-termux | bash && cd ~/LBOT && yarn start
+pkg install wget -y && wget -O - tinyurl.com/lbot-termux | bash && cd ~/LBOT && yarn start
 ```
 <br>
 
 É normal demorar na primeira vez será feito o download de todas as dependências, se tudo der certo será perguntado se você quer se conectar com **QR Code** ou **Código de Pareamento**, faça a sua escolha e se conecte com o aplicativo do WhatsApp. 
 
+<br>
 <br>
 
 Caso você feche o Termux e queira iniciar o bot novamente faça o comando abaixo:
@@ -80,7 +82,7 @@ cd ~/LBOT && yarn start
 <br>
 <br>
 
-## 2 - 🤖 Uso :
+## 🤖 Uso
 
 Seu bot já deve estar iniciando normalmente após o passo anterior, use os comandos abaixo para visualizar os comandos disponíveis.
 
@@ -95,69 +97,45 @@ Todos os comandos tem um guia ao digitar: **!comando** guia
 
 <br>
 
-## 3 - ⚙️ Configuração do bot:
+## ⚙️ Administração do bot/grupo
 
-### Como configurar o DONO:
-Para usar as funções de **administrador** digite **!admin** pela primeira vez ao iniciar ao bot e ai seu número será cadastrado como dono.<br><br>
-Pronto, agora você tem acesso aos comandos de **ADMIN**. Use **!nomebot**, **!nomeautor**, **!nomepack** para personalizar o nome do seu bot em menus e em stickers, e veja todos os comandos de administrador com o **!admin**.<br><br>
+Como ver os comandos de administração geral do **BOT**? <br>
+Envie **!admin** para o WhatsApp do bot e seu número será cadastrado como dono, após ser cadastrado você pode usar o **!admin** para ter acesso ao **menu do administrador**
 
 <br>
 
-## 4 - 🛠️ Recursos/Comandos :
+Como ver os comandos de administração do **GRUPO**? <br>
+Se você for administrador do grupo envie **!menu 5** dentro de um grupo para ter acesso ao menu completo do grupo, caso você não seja administrador do grupo você só terá acesso a um menu limitado.
+
+<br>
+
+## 🛠️ Recursos/Comandos
 
 ### 🖼️ Figurinhas
-- Foto para sticker
-- Video/GIF para sticker
-- Sticker para foto
-- EmojiMix
-- Renomear sticker
-- Auto sticker
+Diversos comandos para criação de figurinhas
 
 ### 📥 Downloads 
-- Youtube (video/audio)
-- Facebook (video)
-- Instagram (video/imagem)
-- X (video/imagem)
-- Tiktok (video)
-- Google (imagem)
+Diversos comandos para download de mídias das principais redes sociais : X, Youtube, Instagram, TikTok...
 
 ### ⚒️ Utilidades Gerais
-- Respostas de IA
-- Criar imagem com IA
-- Pesquisa na Steam verde
-- Brasileirão A/B 
-- Têndencias de filmes/séries
-- Encurtar links 
-- Upload de imagens 
-- Efeitos de aúdio 
-- Texto para voz 
-- Áudio para texto 
-- Letra de música 
-- Reconhecimento de músicas  
-- Detector de DDD 
-- Detector de anime 
-- Clima/Previsão do Tempo
-- Conversão de moedas
-- Calculadora 
-- Pesquisa Google      
-- Noticias Google 
-- Tradutor Google
+Diversos comandos de utilidades como encurtar link, editar áudio, obter letra de música, etc...
+
+### 👾 Entretenimento
+Diversos comandos para entretenimento do grupo
+
+### 👨‍👩‍👦‍👦 Administração de Grupo
+Diversos comandos de grupo para ajudar na administração
+
+### ⚙️ Administração geral do bot
+Diversos para administrar o bot e ter controle sobre ele.
 
 <br>
 
-### 👉 E muito mais... [Clique Aqui](docs/COMANDOS.md)
+### 👉 Lista completa de comandos... [Clique Aqui](docs/COMANDOS.md)
 
 <br>
 
-## 5 - 👤 Contato
-Caso tenha algum problema ou queira ajudar de alguma forma com o projeto. 
-
-* **Email**: victorsouzaleal@gmail.com
-* **WhatsApp (NÃO É O BOT, É MEU CONTATO PESSOAL PELO AMOR DE DEUS)**: https://wa.me/5521995612287
-
-<br>
-
-## 6 - 🙏 Agradecimentos
+## 🙏 Agradecimentos
 
 * A minha mãe e o meu pai que me fizeram com muito amor
 * [`WhiskeySockets/Baileys`](https://github.com/WhiskeySockets/Baileys) - Por disponibilizar a biblioteca Baileys e dar suporte no Discord principalmente a nós brasileiros.

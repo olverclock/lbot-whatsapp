@@ -1,11 +1,13 @@
 import { GroupMetadata, WAMessage, WAPresence, WASocket, S_WHATSAPP_NET, generateWAMessageFromContent, getContentType, proto } from "baileys"
-import { randomDelay } from "../utils/general.util.js"
+import { buildText, randomDelay } from "./general.util.js"
 import { MessageOptions, MessageTypes, Message } from "../interfaces/message.interface.js"
-import * as convertLibrary from './convert.library.js'
+import * as convertLibrary from './convert.util.js'
 import { Group } from "../interfaces/group.interface.js"
-import { User } from "../interfaces/user.interface.js"
-import { removeBold } from "../utils/general.util.js"
+import { removeBold } from "./general.util.js"
 import { GroupController } from "../controllers/group.controller.js"
+import NodeCache from "node-cache"
+import { UserController } from "../controllers/user.controller.js"
+import botTexts from "../helpers/bot.texts.helper.js"
 
 async function updatePresence(client: WASocket, chatId: string, presence: WAPresence){
     await client.presenceSubscribe(chatId)
@@ -235,18 +237,31 @@ export async function demoteParticipant(client: WASocket, groupId: string, parti
     return response
 }
 
-export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: string, admins: User[]){
+export function storeMessageOnCache(message : proto.IWebMessageInfo, messageCache : NodeCache){
+    if (message.key.remoteJid && message.key.id && message.message){
+        messageCache.set(message.key.id, message.message)
+    }    
+}
+
+export function getMessageFromCache(messageId: string, messageCache: NodeCache){
+    let message = messageCache.get(messageId) as proto.IMessage | undefined 
+    return message
+}
+
+export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: string){
     if (!m.message) return
-    
+
     const type = getContentType(m.message)
 
-    if (!type) return 
-    if (!isAllowedType(type)) return 
-    if (!m.message[type]) return
+    if (!type || !isAllowedType(type) || !m.message[type]) return
 
+    const groupController = new GroupController()
+    const userController = new UserController()
+    const botAdmins = await userController.getAdmins()
     const contextInfo : proto.IContextInfo | undefined  = (typeof m.message[type] != "string" && m.message[type] && "contextInfo" in m.message[type]) ? m.message[type].contextInfo as proto.IContextInfo: undefined
     const isQuoted = (contextInfo?.quotedMessage) ? true : false
     const sender = (m.key.fromMe) ? hostId : m.key.participant || m.key.remoteJid
+    const pushName = m.pushName
     const body =  m.message.conversation ||  m.message.extendedTextMessage?.text || undefined
     const caption = (typeof m.message[type] != "string" && m.message[type] && "caption" in m.message[type]) ? m.message[type].caption as string | null: undefined
     const text =  caption || body || ''
@@ -255,9 +270,9 @@ export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: s
     const message_id = m.key.id
     const t = m.messageTimestamp as number
     const chat_id = m.key.remoteJid
-    const isGroupAdmin = (sender && group) ? await new GroupController().isParticipantAdmin(group.id, sender) : false
+    const isGroupAdmin = (sender && group) ? await groupController.isParticipantAdmin(group.id, sender) : false
 
-    if (!message_id || !t || !sender || !chat_id ) return 
+    if (!message_id || !t || !sender || !chat_id ) return
 
     let formattedMessage : Message = {
         message_id,
@@ -266,7 +281,7 @@ export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: s
         t,
         chat_id,
         expiration : contextInfo?.expiration || undefined,
-        pushname: m.pushName || '',
+        pushname: pushName || '',
         body: m.message.conversation || m.message.extendedTextMessage?.text || '',
         caption : caption || '',
         mentioned: contextInfo?.mentionedJid || [],
@@ -276,8 +291,8 @@ export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: s
         isQuoted,
         isGroupMsg,
         isGroupAdmin,
-        isBotAdmin : admins.map(admin => admin.id).includes(sender),
-        isBotOwner: admins.find(admin => admin.owner == true)?.id == sender,
+        isBotAdmin : botAdmins.map(admin => admin.id).includes(sender),
+        isBotOwner: botAdmins.find(admin => admin.owner == true)?.id == sender,
         isBotMessage: m.key.fromMe ?? false,
         isBroadcast: m.key.remoteJid == "status@broadcast",
         isMedia: type != "conversation" && type != "extendedTextMessage",
@@ -303,11 +318,18 @@ export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: s
 
     if (formattedMessage.isQuoted){
         const quotedMessage = contextInfo?.quotedMessage
+
         if (!quotedMessage) return
+    
         const typeQuoted = getContentType(quotedMessage)
+        const quotedStanzaId = contextInfo.stanzaId ?? undefined
         const senderQuoted = contextInfo.participant || contextInfo.remoteJid
+
         if (!typeQuoted || !senderQuoted ) return
+
         const captionQuoted = (typeof quotedMessage[typeQuoted] != "string" && quotedMessage[typeQuoted] && "caption" in quotedMessage[typeQuoted]) ? quotedMessage[typeQuoted].caption as string | null : undefined
+        const quotedWAMessage = generateWAMessageFromContent(formattedMessage.chat_id, quotedMessage, { userJid: senderQuoted, messageId: quotedStanzaId })
+        quotedWAMessage.key.fromMe = (hostId == senderQuoted)
 
         formattedMessage.quotedMessage = {
             type: typeQuoted,
@@ -315,7 +337,7 @@ export async function formatWAMessage(m: WAMessage, group: Group|null, hostId: s
             body: quotedMessage.conversation || quotedMessage.extendedTextMessage?.text || '',
             caption: captionQuoted || '',
             isMedia : typeQuoted != "conversation" && typeQuoted != "extendedTextMessage",
-            wa_message: generateWAMessageFromContent(formattedMessage.chat_id, quotedMessage, {userJid: senderQuoted})
+            wa_message: quotedWAMessage
         }
 
         if (formattedMessage.quotedMessage?.isMedia){
@@ -349,7 +371,10 @@ function isAllowedType(type : keyof proto.IMessage){
         "documentMessage",
         "stickerMessage",
         "videoMessage",
+        "viewOnceMessage",
+        "viewOnceMessageV2",
+        "viewOnceMessageV2Extension"
     ]
 
-    return allowedTypes.includes(type as MessageTypes)
+    return allowedTypes.includes(type)
 }

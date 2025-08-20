@@ -1,12 +1,13 @@
-import {formatSeconds, showConsoleLibraryError} from '../utils/general.util.js'
-import ytdl from '@distube/ytdl-core'
+import {formatSeconds, showConsoleLibraryError} from './general.util.js'
 import {instagramGetUrl} from 'instagram-url-direct'
 import { getFbVideoInfo } from 'fb-downloader-scrapper'
 import Tiktok from '@tobyg74/tiktok-api-dl'
 import axios from 'axios'
 import yts from 'yt-search'
+import ytdl from '@distube/ytdl-core'
 import { FacebookMedia, InstagramMedia, TiktokMedia, XMedia, YTInfo } from '../interfaces/library.interface.js'
-import getBotTexts from '../helpers/bot.texts.helper.js'
+import botTexts from '../helpers/bot.texts.helper.js'
+import crypto from 'node:crypto'
 
 export async function xMedia (url: string){
     try {
@@ -30,30 +31,47 @@ export async function xMedia (url: string){
         return xMedia
     } catch(err) {
         showConsoleLibraryError(err, 'xMedia')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
 export async function tiktokMedia (url : string){
     try {
-        const tiktokResponse = await Tiktok.Downloader(url, {version: "v1"})
+        const tiktokResponse = await Tiktok.Downloader(url, { version: "v1" })
+        let mediaUrl: string | string[]
 
-        if(tiktokResponse.status === 'error') {
+        if (tiktokResponse.status === 'error') {
+            return null
+        }
+
+        if (tiktokResponse.result?.type == 'video'){
+            if (tiktokResponse.result?.video?.playAddr?.length) {
+                mediaUrl = tiktokResponse.result?.video?.playAddr[0]
+            } else {
+                return null
+            } 
+        } else if(tiktokResponse.result?.type == 'image'){
+            if (tiktokResponse.result?.images) {
+                mediaUrl = tiktokResponse.result?.images
+            } else {
+                return null
+            }
+        } else {
             return null
         }
 
         const tiktokMedia : TiktokMedia = {
-            author_profile: tiktokResponse.result?.author.nickname,
-            description : tiktokResponse.result?.description,
-            type: (tiktokResponse.result?.type === "video") ? "video" : "image",
+            author_profile: tiktokResponse.result?.author?.nickname,
+            description : tiktokResponse.result?.desc,
+            type: tiktokResponse.result?.type,
             duration: tiktokResponse.result?.type == "video" ? parseInt(((tiktokResponse.result?.video?.duration as number)/1000).toFixed(0)) : null,
-            url: tiktokResponse.result?.type == "video" ? tiktokResponse.result?.video?.playAddr[0] as string : tiktokResponse.result?.images as string[]
+            url: mediaUrl
         }
 
         return tiktokMedia
     } catch(err) {
         showConsoleLibraryError(err, 'tiktokMedia')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -72,7 +90,7 @@ export async function facebookMedia(url : string) {
         return facebookMedia
     } catch(err) {
         showConsoleLibraryError(err, 'facebookMedia')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -96,9 +114,11 @@ export async function instagramMedia (url: string){
         return instagramMedia
     } catch(err) {
         showConsoleLibraryError(err, 'instagramMedia')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
+
+
 
 export async function youtubeMedia (text : string){
     try {
@@ -113,6 +133,7 @@ export async function youtubeMedia (text : string){
             '__Secure-3PAPISID=OSmwE6VjdFmB1u5-/A2N-7DiRQUreUSpgT; LOGIN_INFO=AFmmF2swRQIgShGx2tfQkQV4F8lyKnh4mwj54yTOPJqEdI44sDTtsrwCIQD870Le1gTMDFpz7rRHS6Fk0HzraG_SxHw_PdyLjUDXxg:QUQ3MjNmeVpqbVhSQlNCMnFFZXBKQkhCTHJxY1NXOVlYcG50SHNNOGxGZGZ3Z2ZobWwyOW95WGJ2LVplelNaZ0RfbGU3Tm1uYktDdHBnVm9fd3N3T0NncVpTN0ZaNlRoTTVETDJHSjV6QkxUWmdYWGx0eVFYeEFqa0gxUGdBYUJKbG5oQ2pBd3RBb0ROWXBwcFQwYkpBRktEQXlWbmZIbHJB;'+ 
             'SIDCC=AKEyXzXkXTftuhPOtObUSCLHxp1byOAtlesMkptSGp8hyE3d97Dvy2UHd4-2ePWBpzUbQhV6; __Secure-1PSIDCC=AKEyXzXlrhkCIONPS4jCvhmtFb8nAKr8fEFCCFEFqN8BKyrw8tKHFh3-r8EWjrqjAKH9Z9fq0A; __Secure-3PSIDCC=AKEyXzWLIbNbh8dxdyKhTafkyKIbEBwVKGR4lNRhhYX5u_v1k4vBnu4eAS9lgpP-JK2PgiSDJw'
         }])
+
         const isURLValid = ytdl.validateURL(text)
         let videoId : string | undefined
 
@@ -149,6 +170,6 @@ export async function youtubeMedia (text : string){
         return ytInfo
     } catch(err) {
         showConsoleLibraryError(err, 'youtubeMedia')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }

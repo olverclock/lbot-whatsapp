@@ -13,16 +13,12 @@ export class UserController{
         return this.userService.registerUser(userId, name)
     }
 
-    public rebuildUsers(){
-        return this.userService.rebuildUsers()
+    public migrateUsers(){
+        return this.userService.migrateUsers()
     }
 
     public setName(userId: string, name: string){
         return this.userService.setName(userId, name)
-    }
-
-    public isUserRegistered(userId: string){
-        return this.userService.isUserRegistered(userId)
     }
 
     public promoteUser(userId: string){
@@ -61,12 +57,12 @@ export class UserController{
         return this.userService.increaseUserCommandsCount(userId)
     }
 
-    public async hasExpiredCommands(user: User, currentTimestamp: number){
-        return this.userService.hasExpiredCommands(user, currentTimestamp)
+    public async expireCommandsRate(userId: string, currentTimestamp: number){
+        return this.userService.expireCommandsRate(userId, currentTimestamp)
     }
 
-    public async hasExpiredLimited(user: User, botInfo: Bot, currentTimestamp: number){
-        return this.userService.hasExpiredLimited(user, botInfo, currentTimestamp)
+    public async incrementCommandRate(userId: string){
+        return this.userService.incrementCommandRate(userId)
     }
 
     public setLimitedUser(userId: string, isLimited: boolean, botInfo: Bot, currentTimestamp: number){

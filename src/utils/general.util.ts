@@ -2,40 +2,68 @@ import moment from "moment-timezone"
 import chalk from 'chalk'
 import path from 'node:path'
 import fs from 'fs-extra'
-import { Bot } from "../interfaces/bot.interface.js"
-import getBotTexts from "../helpers/bot.texts.helper.js"
 import { Message } from "../interfaces/message.interface.js"
+import botTexts from "../helpers/bot.texts.helper.js"
 import { FileExtensions } from "../interfaces/library.interface.js"
 import { tmpdir } from "node:os"
 import crypto from 'node:crypto'
+import readline from 'readline/promises'
+import { BotController } from "../controllers/bot.controller.js"
+import { getCommandGuide } from "./commands.util.js"
+let rl: readline.Interface | null = null;
 
-export function messageErrorCommandUsage(botInfo: Bot, message: Message){
-    const botTexts = getBotTexts(botInfo)
-    return buildText(botTexts.error_command_usage, message.command, message.command)
+export async function askQuestion(question: string) {
+    const getReadline = () => {
+      if (rl){
+        rl?.close()
+        rl = null
+      }
+
+      rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout
+      })
+
+      return rl
+    }
+
+    const rlInstance = getReadline()
+    const answer = await rlInstance.question(question)
+
+    return answer
 }
 
-export function messageErrorCommand(botInfo: Bot, command: string, reason: string){
-    const botTexts = getBotTexts()
-    return buildText(botTexts.error_command, command, reason)
+export function messageErrorCommandUsage(prefix: string, message: Message){
+  return buildText(botTexts.error_command_usage, message.command, getCommandGuide(prefix, message.command))
+}
+
+export function messageErrorCommand(command: string, reason: string){
+  return buildText(botTexts.error_command, command, reason)
 }
 
 export function getCurrentBotVersion(){
-    return JSON.parse(fs.readFileSync(path.resolve('package.json'), {encoding: 'utf-8'})).version
+  return JSON.parse(fs.readFileSync(path.resolve('package.json'), {encoding: 'utf-8'})).version
 }
 
 export function colorText(text: string, color?: string){
-    return !color ? chalk.green(text) : chalk.hex(color)(text)
+  return !color ? chalk.green(text) : chalk.hex(color)(text)
 }
 
 export function buildText(text : string, ...params : any[]){
-  for(let i = 0; i < params.length; i++){
-      text = text.replace(`{p${i+1}}`, params[i])
+  if (text.includes('{$p}')) {
+    const prefix = new BotController().getBot().prefix
+    text = text.replaceAll('{$p}', prefix)
   }
+
+  for (let i = 0; i < params.length; i++){
+    text = text.replaceAll(`{$${i+1}}`, params[i])
+  }
+
   return text
 }
 
 export function timestampToDate(timestamp : number){
-    return moment(timestamp).format('DD/MM/YYYY HH:mm:ss')
+  return moment(timestamp).format('DD/MM/YYYY HH:mm:ss')
 }
 
 export function formatSeconds(seconds : number){
@@ -47,21 +75,21 @@ export function currentDate(){
 }
 
 export function getResponseTime(timestamp: number){
-    let responseTime = ((moment.now()/1000) - timestamp).toFixed(2)
-    return responseTime
+  let responseTime = ((moment.now()/1000) - timestamp).toFixed(2)
+  return responseTime
 }
 
 export function showCommandConsole(isGroup : boolean, categoryName: string, command: string, hexColor: string, messageTimestamp: number, pushName: string, groupName?: string){
-    let formattedMessageTimestamp = timestampToDate(messageTimestamp * 1000)
-    let responseTimeSeconds = getResponseTime(messageTimestamp)
-    if (!pushName) pushName = "DESCONHECIDO"
-    if (!groupName) groupName = "DESCONHECIDO"
+  let formattedMessageTimestamp = timestampToDate(messageTimestamp * 1000)
+  let responseTimeSeconds = getResponseTime(messageTimestamp)
+  if (!pushName) pushName = "DESCONHECIDO"
+  if (!groupName) groupName = "DESCONHECIDO"
 
-    if (isGroup){
-      console.log('\x1b[1;31m~\x1b[1;37m>', colorText(`[${categoryName}]`, hexColor), formattedMessageTimestamp, colorText(command), 'de', colorText(pushName), 'em', colorText(groupName), `(${colorText(`${responseTimeSeconds}s`)})`)
-    } else {
-      console.log('\x1b[1;31m~\x1b[1;37m>', colorText(`[${categoryName}]`, hexColor), formattedMessageTimestamp, colorText(command), 'de', colorText(pushName), `(${colorText(`${responseTimeSeconds}s`)})`)
-    }
+  if (isGroup){
+    console.log('\x1b[1;31m~\x1b[1;37m>', colorText(`[${categoryName}]`, hexColor), formattedMessageTimestamp, colorText(command), 'de', colorText(pushName), 'em', colorText(groupName), `(${colorText(`${responseTimeSeconds}s`)})`)
+  } else {
+    console.log('\x1b[1;31m~\x1b[1;37m>', colorText(`[${categoryName}]`, hexColor), formattedMessageTimestamp, colorText(command), 'de', colorText(pushName), `(${colorText(`${responseTimeSeconds}s`)})`)
+  }
 }
 
 export function uppercaseFirst(text: string){
@@ -69,7 +97,7 @@ export function uppercaseFirst(text: string){
 }
 
 export function removeBold(text: string){
-    return text.replace(/\*/gm, "").trim()
+  return text.replace(/\*/gm, "").trim()
 }
 
 export function removeFormatting(text: string){
@@ -77,12 +105,12 @@ export function removeFormatting(text: string){
 }
 
 export function randomDelay(ms_min : number, ms_max : number){
-   return new Promise <void> ((resolve, reject)=>{
-      let randomDelayMs = Math.floor(Math.random() * (ms_max - ms_min + 1)) + ms_min
-      setTimeout(async ()=>{
-          resolve()
-      }, randomDelayMs)
-   })
+  return new Promise <void> ((resolve, reject)=>{
+    let randomDelayMs = Math.floor(Math.random() * (ms_max - ms_min + 1)) + ms_min
+    setTimeout(async ()=>{
+      resolve()
+    }, randomDelayMs)
+  })
 }
 
 export function showConsoleError(err: any, error_type : string){
@@ -104,4 +132,21 @@ export function getTempPath(ext: FileExtensions){
   
   return path.join(tmpdir(), 'lbot-whatsapp', `${crypto.randomBytes(20).toString('hex')}.${ext}`)
 }
+
+export function deepMerge<T>(defaultObj: T, overrideObj: any): T {
+  const result: any = { ...defaultObj }
+
+  for (const key in defaultObj) {
+    if (overrideObj && Object.prototype.hasOwnProperty.call(overrideObj, key)) {
+      if (typeof defaultObj[key] === 'object' && defaultObj[key] !== null && !Array.isArray(defaultObj[key])) {
+        result[key] = deepMerge(defaultObj[key], overrideObj[key]);
+      } else {
+        result[key] = overrideObj[key];
+      }
+    }
+  }
+
+  return result
+}
+
 

@@ -1,8 +1,8 @@
 import ffmpeg from 'fluent-ffmpeg'
 import fs from 'fs-extra'
 import axios from 'axios'
-import {getTempPath, showConsoleLibraryError} from '../utils/general.util.js'
-import getBotTexts from '../helpers/bot.texts.helper.js'
+import {getTempPath, showConsoleLibraryError} from './general.util.js'
+import botTexts from '../helpers/bot.texts.helper.js'
 
 export async function convertMp4ToMp3 (sourceType: 'buffer' | 'url',  video: Buffer | string){
     try {
@@ -45,7 +45,7 @@ export async function convertMp4ToMp3 (sourceType: 'buffer' | 'url',  video: Buf
         return audioBuffer
     } catch(err){
         showConsoleLibraryError(err, 'convertMp4ToMp3')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -102,7 +102,7 @@ export async function convertVideoToWhatsApp(sourceType: 'buffer' | 'url',  vide
         return videoBuffer
     } catch(err){
         showConsoleLibraryError(err, 'convertVideoToWhatsApp')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
 }
 
@@ -161,6 +161,62 @@ export async function convertVideoToThumbnail(sourceType : "file"|"buffer"|"url"
         return thumbBase64
     } catch(err){
         showConsoleLibraryError(err, 'convertVideoToThumbnail')
-        throw new Error(getBotTexts().library_error)
+        throw new Error(botTexts.library_error)
     }
+}
+
+export async function extractAudioFromVideo(sourceType : "file"|"buffer"|"url", video : Buffer | string){
+    let inputVideoPath = getTempPath('mp4')
+    const outputAudioPath = getTempPath('mp3')
+
+    if(sourceType == "file"){
+        if (typeof video !== 'string') {
+            throw new Error('The media type is File, but the video parameter is not a String.')
+        }
+
+        inputVideoPath = video
+    } else if (sourceType == 'buffer'){
+        if (!Buffer.isBuffer(video)) {
+            throw new Error('The media type is Buffer, but the video parameter is not a Buffer.')
+        }
+
+        fs.writeFileSync(inputVideoPath, video)
+    } else if (sourceType == 'url'){
+        if (typeof video != 'string') {
+            throw new Error('The media type is URL, but the video parameter is not a String.')
+        }
+
+        const {data : mediaResponse} = await axios.get(video, {responseType: 'arraybuffer'})
+        const videoBuffer = Buffer.from(mediaResponse)
+        fs.writeFileSync(inputVideoPath, videoBuffer)
+    } else {
+        throw new Error('Unsupported media type.')
+    }
+
+    await new Promise <void> (async (resolve, reject)=>{
+        ffmpeg(inputVideoPath)
+        .noVideo()
+        .audioCodec('libmp3lame')
+        .audioBitrate('192k')
+        .format('mp3')
+        .save(outputAudioPath)
+        .on('end', () => resolve())
+        .on('error', (err) => reject(err))
+    }).catch((err)=>{
+        if (sourceType != 'file' && inputVideoPath) {
+            fs.unlinkSync(inputVideoPath)
+        }
+
+        throw err
+    })
+
+    if (sourceType != 'file' && inputVideoPath){
+        fs.unlinkSync(inputVideoPath)
+    }
+
+    const audioBuffer = fs.readFileSync(outputAudioPath)
+    fs.unlinkSync(outputAudioPath)
+    
+    return audioBuffer
+
 }

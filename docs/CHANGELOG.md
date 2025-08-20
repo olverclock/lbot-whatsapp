@@ -1,6 +1,165 @@
 # Notas de atualização
 Colocarei neste arquivos as mudanças significativas em cada versão começando na versão 3.0.0
 
+## 3.4.6 - 09/06/2025
+
+### CORREÇÕES
+- Corrigido erro dos comandos do Youtube (**!play** e **!yt**) revertendo para a biblioteca **ytdl-core**
+
+## 3.4.5 - 07/06/2025
+
+### CORREÇÕES
+- Corrigido o comando no README para fazer instalação no Termux
+
+### ALTERAÇÕES
+- Revertida a versão da API do Tiktok
+
+### DEPENDENCIAS
+- As dependencias do projeto foram atualizadas para as versões mais recentes.
+
+## 3.4.4 - 01/06/2025
+
+### CORREÇÕES
+- Corrigida a conexão por código de pareamento.
+
+### DEPENDENCIAS
+- As dependencias do projeto foram atualizadas para as versões mais recentes.
+
+## 3.4.3 - 23/05/2025
+
+### ALTERAÇÕES
+- Alterada versão da API do Tiktok
+
+## 3.4.2 - 20/05/2025
+
+### DEPENDENCIAS
+- As dependencias do projeto foram atualizadas para as versões mais recentes.
+
+## 3.4.1 - 06/05/2025
+
+### CORREÇÃO
+- Correção na conexão com código de pareamento
+- Correção no download de mídias do Instagram
+
+## 3.4.0 - 02/05/2025
+
+### GERAL
+- Melhoria na migração de dados que acontece após cada atualização.
+- O menu de grupo foi reorganizado e agora exibe os recursos do grupo em categorias separadas.
+- A mensagem de erro quando um usuário fazia um comando incorretamente agora exibe diretamente o guia do comando.
+
+### NOVO
+- Recurso **Respostas automáticas (Grupo)**: Novo recurso de **GRUPO** para configurar mensagens automáticas de acordo com as palavras configuradas.
+- Comando **!audio**: Novo comando **UTILITÁRIO** para extrair áudio de vídeos.
+
+### ALTERAÇÕES
+- Recurso **Anti-fake**: O Anti-fake recebeu comandos para adicionar/remover exceções de prefixos internacionais ou até mesmo um número especifico, e as configurações não serão zeradas quando este recurso for desabilitado.
+- Recurso **Anti-link**: O Anti-link recebeu comandos para adicionar/remover exceções de links, e as configurações não serão zeradas quando este recurso for desabilitado.
+- Comando **!audio**: O comando de efeito de áudio agora foi renomeado para **!efeitoaudio**
+
+### CORREÇÃO
+- Correção no **Anti-fake** que não incluía o DDI 55 automaticamente quando configurava as exceções e podia gerar bans acidentais.
+- Correções nos efeitos de grave/agudo no comando **!efeitoaudio**
+
+## 3.3.7 - 25/04/2025
+
+### GERAL
+- Agora o bot sincroniza todas as mensagens antes de iniciar, isso pode demorar dependendo de quantos grupos o bot está e por quanto tempo o bot estava offline recebendo mensagens.
+
+### CORREÇÃO
+- Corrigido possíveis erros na reconstrução do banco de dados
+- Corrigido erros nos comandos do Youtube **!play** e **!yt**
+- Corrigido erro na criação de stickers em imagens com formato **webp**
+- Corrigido envio incorreto de imagem que poderia acontecer no comando **!detector**
+
+
+## 3.3.6 - 21/04/2025
+
+### CORREÇÃO
+- Corrigido o registro de grupos, agora as mensagens de grupo devem ser reconhecidas corretamente.
+
+## 3.3.5 - 21/04/2025
+
+### GERAL
+- O registro do Baileys agora está ativo para indicar qualquer problema no bot, não se assuste se aparecer mais letras no console.
+- Foram adicionadas mais mensagens de erro nos caso de não conseguir ler a mensagem ou a mensagem não poder ser formatada de forma correta.
+
+### CORREÇÃO
+- Correção no registro de usuários, alguns grupos estavam sendo registrados como usuário indevidamente.
+
+## 3.3.4 - 21/04/2025
+
+### GERAL
+- Revertida versão do Baileys para a última versão original
+- O problema de grupos ainda não foi resolvido, estarei aguardando uma nova versão do Baileys.
+
+## 3.3.3 - 21/04/2025
+
+### CORREÇÕES
+- Mais uma tentativa em corrigir as sessões em grupos
+
+## 3.3.2 - 20/04/2025
+
+### CORREÇÕES
+- Correção de erro ao tentar usar o código de pareamento
+- O armazenamento de sessão foi revertido para a versão antiga já que vários usuários de Termux relataram problemas
+
+## 3.3.1 - 20/04/2025
+
+### CORREÇÕES
+- Correção na mensagem de espera do comando **!ig**
+- Correção na sessão que não estava detectando corretamente algumas mensagens de grupo.
+
+## 3.3.0 - 18/04/2025
+
+### Com as novas mudanças na sessão após essa atualização você terá que se conectar novamente lendo o código QR ou código de pareamento.
+
+### GERAL
+- O armazenamento de dados da sessão foi melhorado, isso deve ajudar a resolver alguns problemas do bot parar de responder do nada e alguns outros erros que aconteciam raramente.
+- O bot agora só lê as mensagens após iniciar totalmente para garantir que as mensagens recebidas são novas e não de quando ele estava desligado.
+- Os stickers criados agoram recebem o nome de quem fez o comando como autor do sticker.
+- As imagens enviadas pelos comandos da categoria **VARIADO** agora ficam armazenadas localmente.
+- Adicionado suporte a exceções de links no recurso **ANTI-LINK**
+
+### COMANDOS
+- Comando **!nomeautor** foi removido
+- Comando **!nomepack**  foi removido
+
+### CORREÇÕES
+- Correção da exibição da lista no comando **!top5**
+- Correção da conversão de sticker para imagem no comando **!simg**
+- Correção do erro 429 em comandos da categoria **VARIADO**
+
+## 3.2.0 - 11/04/2025
+
+### GERAL
+- A partir dessa versão o banco de dados é reconstruído a cada atualização não sendo mais necessário perder os dados para atualizar.
+- Melhoria na sincronização de grupos.
+- Melhoria na fila de eventos para evitar eventos desnecessários.
+- Pequenas alterações nos textos exibidos no terminal em cada inicialização.
+
+### COMANDOS
+- Todos os comandos que necessitavam de uma chave API (com pouco limite) foram removidos, no momento apenas o **!ia** e **!criarimg** por serem altamente requisitados e acabar rápido o limite.
+- Adicionada mensagem de erro ao usar o **!grupos** se o bot não estiver em nenhum grupo.
+
+### CORREÇÕES
+- Correção ao remover administrador do grupo que não era reconhecido pelo bot que um membro não já não era mais administrador.
+
+## 3.2.0 - 11/04/2025
+
+### GERAL
+- A partir dessa versão o banco de dados é reconstruído a cada atualização não sendo mais necessário perder os dados para atualizar.
+- Melhoria na sincronização de grupos.
+- Melhoria na fila de eventos para evitar eventos desnecessários.
+- Pequenas alterações nos textos exibidos no terminal em cada inicialização.
+
+### COMANDOS
+- Todos os comandos que necessitavam de uma chave API (com pouco limite) foram removidos, no momento apenas o **!ia** e **!criarimg** por serem altamente requisitados e acabar rápido o limite.
+- Adicionada mensagem de erro ao usar o **!grupos** se o bot não estiver em nenhum grupo.
+
+### CORREÇÕES
+- Correção ao remover administrador do grupo que não era reconhecido pelo bot que um membro não já não era mais administrador.
+
 ## 3.1.5 - 04/04/2025
 
 ### CORREÇÕES
